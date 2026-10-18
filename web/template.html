@@ -101,7 +101,8 @@ button.link.danger { color: var(--danger); }
 .compose-start { display: grid; gap: 0.6rem; }
 .compose-start p { font-family: var(--font-display); font-size: var(--step-1); }
 .compose-kinds { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; }
-.kind-pick { text-align: left; padding: 0.8rem 0.9rem; border-radius: 6px; border: 1.5px solid color-mix(in srgb, var(--kind) 45%, var(--line)); background: color-mix(in srgb, var(--kind) 8%, var(--surface)); font-weight: 700; cursor: pointer; min-height: 3.2rem; }
+.kind-pick .icon { width: 1.9rem; height: 1.9rem; color: var(--kind); }
+.kind-pick { display: flex; flex-direction: column; align-items: flex-start; gap: 0.35rem; text-align: left; padding: 0.8rem 0.9rem; border-radius: 6px; border: 1.5px solid color-mix(in srgb, var(--kind) 45%, var(--line)); background: color-mix(in srgb, var(--kind) 8%, var(--surface)); font-weight: 700; cursor: pointer; min-height: 3.2rem; }
 .kind-pick:hover { background: color-mix(in srgb, var(--kind) 16%, var(--surface)); }
 
 form { display: grid; gap: 0.35rem; }
@@ -129,7 +130,14 @@ form button[type="submit"] { margin-top: 0.75rem; justify-self: start; }
 .posts { display: grid; gap: 0.9rem; }
 .post { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 1rem 1rem 1.1rem; display: grid; gap: 0.5rem; }
 .post .kind { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; font-size: 0.9rem; color: var(--kind); }
-.post .kind::before { content: ""; width: 0.95rem; height: 0.95rem; background: var(--kind); clip-path: polygon(50% 0, 100% 45%, 100% 100%, 0 100%, 0 45%); }
+/* The kind's own symbol (web/icons.ts), drawn in the kind's colour */
+.icon { flex: none; width: 1.25em; height: 1.25em; }
+.post .kind .icon { width: 1.6rem; height: 1.6rem; padding: 0.2rem; border-radius: 50%; background: color-mix(in srgb, var(--kind) 14%, var(--surface)); box-sizing: content-box; }
+.chip { display: inline-flex; align-items: center; gap: 0.35rem; }
+.chip .icon { width: 1.1rem; height: 1.1rem; color: var(--kind, currentColor); }
+.chip.is-on .icon { color: inherit; }
+.composer h2 { display: flex; align-items: center; gap: 0.5rem; }
+.composer h2 .icon { color: var(--kind); width: 1.6rem; height: 1.6rem; }
 .discreet { font-weight: 700; color: var(--surface); background: var(--hav); border-radius: 3px; padding: 0 0.4rem; font-size: 0.8rem; }
 .post h3 { font-size: var(--step-1); font-weight: 700; }
 .when { font-weight: 700; }

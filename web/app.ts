@@ -6,6 +6,7 @@ import { KIND_INFO } from "../src/domain/torget.ts";
 import type { Application, Message, PostKind, Role, User, Village } from "../src/domain/types.ts";
 import type { PostView } from "../src/service.ts";
 import type { Conversation, LandsbyApi, Me, MemberView, Preview } from "./api.ts";
+import { KIND_ICONS } from "./icons.ts";
 
 type Tab = "torget" | "samtaler" | "vert";
 
@@ -240,7 +241,7 @@ export function startApp(options: AppOptions): void {
       .concat(
         KIND_ORDER.map(
           (kind) =>
-            `<button type="button" class="chip kind-${kind} ${state.kind === kind ? "is-on" : ""}" data-action="kind" data-kind="${kind}">${esc(KIND_INFO[kind].label)}</button>`
+            `<button type="button" class="chip kind-${kind} ${state.kind === kind ? "is-on" : ""}" data-action="kind" data-kind="${kind}">${KIND_ICONS[kind]}<span>${esc(KIND_INFO[kind].label)}</span></button>`
         )
       )
       .join("");
@@ -256,14 +257,14 @@ export function startApp(options: AppOptions): void {
       return `<div class="compose-start">
         <p>Hva vil du ta opp med landsbyen?</p>
         <div class="compose-kinds">${KIND_ORDER.map(
-          (k) => `<button type="button" class="kind-pick kind-${k}" data-action="compose" data-kind="${k}">${esc(FORM_TITLES[k])}</button>`
+          (k) => `<button type="button" class="kind-pick kind-${k}" data-action="compose" data-kind="${k}">${KIND_ICONS[k]}<span>${esc(FORM_TITLES[k])}</span></button>`
         ).join("")}</div>
       </div>`;
     }
     const invitation = kind === "invitasjon";
     return `<form class="composer kind-${kind}" data-form="post">
       <div class="composer-head">
-        <h2>${esc(FORM_TITLES[kind])}</h2>
+        <h2>${KIND_ICONS[kind]}<span>${esc(FORM_TITLES[kind])}</span></h2>
         <button type="button" class="link" data-action="compose" data-kind="">Avbryt</button>
       </div>
       <label for="f-title">Overskrift</label>
@@ -334,7 +335,7 @@ export function startApp(options: AppOptions): void {
     }
 
     return `<article class="post kind-${post.kind}">
-      <p class="kind">${esc(info.label)}${post.discreet ? '<span class="discreet">Diskret</span>' : ""}</p>
+      <p class="kind">${KIND_ICONS[post.kind]}<span>${esc(info.label)}</span>${post.discreet ? '<span class="discreet">Diskret</span>' : ""}</p>
       <h3>${esc(post.title)}</h3>
       ${when}
       ${post.body ? `<p class="body">${esc(post.body)}</p>` : ""}
