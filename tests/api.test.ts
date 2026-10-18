@@ -46,7 +46,7 @@ describe("Uten innlogging", () => {
     const preview = await call(null, "GET", `${V}/preview`);
     assert.equal(preview.status, 200);
     assert.equal(preview.body.postsOnTorget, 7);
-    assert.deepEqual(Object.keys(preview.body.upcomingInvitations[0]).sort(), ["tags", "title", "when"]);
+    assert.deepEqual(Object.keys(preview.body.upcomingInvitations[0]).sort(), ["category", "tags", "title", "when"]);
     assert.ok(!JSON.stringify(preview.body).includes("Nordmann"));
   });
 

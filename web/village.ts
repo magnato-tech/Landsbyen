@@ -1,4 +1,4 @@
-// The living roofline: what happens in the village the coming week, as symbols standing over the
+// The living roofline: what happens in the village the coming two weeks, as symbols standing over the
 // roofs in the band at the top. Pure, so it can be tested: which posts get a symbol, and over
 // which roof each one stands.
 
@@ -40,10 +40,10 @@ export const ROOFTOPS = {
 const HOUSE_ORDER = [2, 3, 4, 1, 5, 0, 6];
 
 export const ROOF_MAX = 8;
-export const ROOF_DAYS = 7;
+export const ROOF_DAYS = 14;
 
 /**
- * The posts that get a symbol, at most eight: invitations happening within the coming week,
+ * The posts that get a symbol, at most eight: invitations happening within the coming two weeks,
  * soonest first; then open requests for help and offers, newest first. A discreet request
  * never stands over a roof.
  */

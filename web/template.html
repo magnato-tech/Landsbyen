@@ -58,7 +58,17 @@ button, input, textarea, select { font: inherit; color: inherit; }
 /* The band */
 .top { background: var(--skog); color: var(--skog-ink); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
 .top-inner { max-width: 40rem; margin: 0 auto; padding-block: 1.25rem 1.25rem; display: grid; gap: 1rem; }
-.roofline { width: 100%; max-width: 100%; height: auto; display: block; order: -1; }
+.village { position: relative; order: -1; }
+.roofline { width: 100%; max-width: 100%; height: auto; display: block; }
+.landmarks { position: absolute; inset: 0; pointer-events: none; }
+/* A symbol over a roof: a small round sign with the kind's colour, standing on the roof's top */
+.landmark { pointer-events: auto; position: absolute; transform: translate(-50%, -100%); width: clamp(1.9rem, 8.5vw, 2.6rem); height: clamp(1.9rem, 8.5vw, 2.6rem); display: grid; place-items: center; border-radius: 50%; border: 2px solid var(--kind); background: var(--surface); color: var(--kind); padding: 0; box-shadow: 0 2px 0 color-mix(in srgb, var(--skog) 60%, black); }
+button.landmark { cursor: pointer; }
+button.landmark:hover { transform: translate(-50%, -100%) scale(1.08); }
+.landmark .icon { width: 62%; height: 62%; }
+.landmark::after { content: ""; position: absolute; top: 100%; left: 50%; width: 2px; height: 0.35rem; background: var(--kind); transform: translateX(-50%); }
+.village-hint { font-size: 0.9rem; opacity: 0.85; margin-top: 0.5rem; }
+.post.is-pointed { outline: 3px solid var(--kind); outline-offset: 3px; }
 .r-house path { fill: var(--roof); }
 .r-church path { fill: var(--roof-church); }
 .r-window rect { fill: var(--skog); }
@@ -203,7 +213,7 @@ section > h2 { font-size: var(--step-1); }
 
 @media (min-width: 40rem) {
   .top-inner { grid-template-columns: 1fr auto; align-items: end; }
-  .roofline { grid-column: 1 / -1; }
+  .village { grid-column: 1 / -1; }
   .switcher { min-width: 15rem; }
   .compose-kinds { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .thread { bottom: 2rem; border-radius: 12px; }

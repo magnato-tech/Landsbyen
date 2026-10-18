@@ -7,6 +7,7 @@ import { INVITATION_CATEGORIES, type Application, type InvitationCategory, type 
 import type { PostView } from "../src/service.ts";
 import type { Conversation, LandsbyApi, Me, MemberView, Preview } from "./api.ts";
 import { CATEGORY_ICONS, KIND_ICONS } from "./icons.ts";
+import { placeOnRoofs, roofPosts, type Landmark, type RoofPost } from "./village.ts";
 
 type Tab = "torget" | "samtaler" | "vert";
 
@@ -27,6 +28,10 @@ interface State {
   category: InvitationCategory | null;
   tag: string | null;
   posts: PostView[];
+  /** Everything on the torget, unfiltered: what the roofline shows. */
+  allPosts: PostView[];
+  /** A post just reached from the roofline, outlined for a moment. */
+  pointed: string | null;
   preview: Preview | null;
   conversations: Conversation[];
   applications: Application[];
@@ -85,6 +90,8 @@ export function startApp(options: AppOptions): void {
     category: null,
     tag: null,
     posts: [],
+    allPosts: [],
+    pointed: null,
     preview: null,
     conversations: [],
     applications: [],
@@ -157,6 +164,8 @@ export function startApp(options: AppOptions): void {
   }
 
   async function loadTab(): Promise<void> {
+    // The roofline always shows the whole village, whatever the list is filtered to
+    if (state.role) state.allPosts = await api.posts({});
     if (state.tab === "torget") {
       state.posts = await api.posts({ kind: state.kind ?? undefined, category: state.category ?? undefined, tag: state.tag ?? undefined });
     }
@@ -175,22 +184,55 @@ export function startApp(options: AppOptions): void {
 
   // ---------- Drawing ----------
 
+  /** What stands over the roofs: the member's torget, or the preview for someone outside. */
+  function landmarks(): Landmark[] {
+    const source: RoofPost[] = state.role
+      ? state.allPosts
+      : (state.preview?.upcomingInvitations ?? []).map((i) => ({ kind: "invitasjon" as const, ...i }));
+    return placeOnRoofs(roofPosts(source, today(), (moment) => dayIn(tz(), moment)));
+  }
+
+  function landmarkLabel(post: Landmark): string {
+    const what = post.kind === "invitasjon" ? CATEGORY_NAMES[post.category ?? "annet"] : KIND_INFO[post.kind].label;
+    return `${what}: ${post.title}${post.when ? `, ${whenText(post.when)}` : ""}`;
+  }
+
   function roofline(): string {
-    // A row of houses with the church among them: the village and who runs it, at a glance
-    return `<svg class="roofline" viewBox="0 0 360 64" role="img" aria-label="Hus og kirke i landsbyen">
-      <g class="r-house">
-        <path d="M6 64V36l20-16 20 16v28z"/><path d="M52 64V42l16-13 16 13v22z"/>
-        <path d="M90 64V30l24-19 24 19v34z"/>
-      </g>
-      <g class="r-church">
-        <path d="M150 64V34l22-18 22 18v30z"/><path d="M165 22V10h14v12l-7-6z"/><path d="M171 2h2v8h-2z"/><path d="M168 4h8v2h-8z"/>
-      </g>
-      <g class="r-house">
-        <path d="M202 64V40l18-14 18 14v24z"/><path d="M244 64V32l22-17 22 17v32z"/>
-        <path d="M294 64V44l15-12 15 12v20z"/><path d="M330 64V38l14-11 14 11v26z"/>
-      </g>
-      <g class="r-window"><rect x="22" y="44" width="8" height="8"/><rect x="108" y="40" width="10" height="9"/><rect x="168" y="44" width="8" height="12" rx="4"/><rect x="258" y="42" width="9" height="9"/></g>
-    </svg>`;
+    // A row of houses with the church among them: the village and who runs it, at a glance.
+    // Over the roofs stand the symbols of what happens the coming week.
+    const marks = landmarks()
+      .map((post) => {
+        const icon = post.kind === "invitasjon" ? CATEGORY_ICONS[post.category ?? "annet"] : KIND_ICONS[post.kind];
+        // Positions in the drawing's own units: 360 wide, with 34 of sky above the roofs
+        const style = `left:${((post.x / 360) * 100).toFixed(2)}%;top:${(((post.y + 34) / 98) * 100).toFixed(2)}%`;
+        const label = esc(landmarkLabel(post));
+        return post.id
+          ? `<button type="button" class="landmark kind-${post.kind}" style="${style}" data-action="landmark" data-post="${esc(post.id)}" aria-label="${label}" title="${label}">${icon}</button>`
+          : `<span class="landmark kind-${post.kind}" style="${style}" role="img" aria-label="${label}" title="${label}">${icon}</span>`;
+      })
+      .join("");
+    return `<div class="village">
+      <svg class="roofline" viewBox="0 -34 360 98" role="img" aria-label="Hus og kirke i landsbyen">
+        <g class="r-house">
+          <path d="M6 64V36l20-16 20 16v28z"/><path d="M52 64V42l16-13 16 13v22z"/>
+          <path d="M90 64V30l24-19 24 19v34z"/>
+        </g>
+        <g class="r-church">
+          <path d="M150 64V34l22-18 22 18v30z"/><path d="M165 22V10h14v12l-7-6z"/><path d="M171 2h2v8h-2z"/><path d="M168 4h8v2h-8z"/>
+        </g>
+        <g class="r-house">
+          <path d="M202 64V40l18-14 18 14v24z"/><path d="M244 64V32l22-17 22 17v32z"/>
+          <path d="M294 64V44l15-12 15 12v20z"/><path d="M330 64V38l14-11 14 11v26z"/>
+        </g>
+        <g class="r-window"><rect x="22" y="44" width="8" height="8"/><rect x="108" y="40" width="10" height="9"/><rect x="168" y="44" width="8" height="12" rx="4"/><rect x="258" y="42" width="9" height="9"/></g>
+      </svg>
+      ${marks ? `<div class="landmarks">${marks}</div>` : ""}
+    </div>`;
+  }
+
+  function villageHint(): string {
+    if (!landmarks().length) return "";
+    return `<p class="village-hint">Over takene står det som skjer de neste to ukene.${state.role ? " Trykk på et symbol for å se innlegget." : ""}</p>`;
   }
 
   function header(): string {
@@ -213,6 +255,7 @@ export function startApp(options: AppOptions): void {
         <div class="who">
           <h1>${esc(village?.name ?? "Landsbyen")}</h1>
           ${village ? `<p class="anchor">Drevet av <strong>${esc(village.anchor.name)}</strong></p>` : ""}
+          ${villageHint()}
         </div>
         ${switcher}
       </div>
@@ -370,7 +413,7 @@ export function startApp(options: AppOptions): void {
       </div>`;
     }
 
-    return `<article class="post kind-${post.kind}">
+    return `<article class="post kind-${post.kind} ${state.pointed === post.id ? "is-pointed" : ""}" id="post-${esc(post.id)}">
       <p class="kind">${post.kind === "invitasjon" ? CATEGORY_ICONS[post.category ?? "annet"] : KIND_ICONS[post.kind]}<span>${esc(post.kind === "invitasjon" && post.category && post.category !== "annet" ? CATEGORY_NAMES[post.category] : info.label)}</span>${post.discreet ? '<span class="discreet">Diskret</span>' : ""}</p>
       <h3>${esc(post.title)}</h3>
       ${when}
@@ -519,6 +562,25 @@ export function startApp(options: AppOptions): void {
     switch (action) {
       case "dismiss":
         return render();
+      case "landmark":
+        // From the roofline to the post itself: the whole torget, scrolled to it
+        state.tab = "torget";
+        state.kind = null;
+        state.category = null;
+        state.tag = null;
+        state.composing = null;
+        state.pointed = post!;
+        return void attempt(loadTab).then(() => {
+          const article = document.getElementById(`post-${post}`);
+          const still = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+          article?.scrollIntoView({ behavior: still ? "auto" : "smooth", block: "center" });
+          article?.querySelector<HTMLElement>("h3")?.setAttribute("tabindex", "-1");
+          article?.querySelector<HTMLElement>("h3")?.focus({ preventScroll: true });
+          window.setTimeout(() => {
+            state.pointed = null;
+            article?.classList.remove("is-pointed");
+          }, 2200);
+        });
       case "tab":
         state.tab = tab as Tab;
         state.composing = null;

@@ -84,7 +84,7 @@ paths:
     get:
       tags: [Landsby]
       summary: Utdrag av torget for den som vurderer å søke
-      description: Kommende invitasjoner og antall innlegg, uten navn og uten hjelpeforespørsler.
+      description: Opptil åtte kommende invitasjoner og antall innlegg, uten navn og uten hjelpeforespørsler.
       security: []
       responses:
         "200":
@@ -494,6 +494,7 @@ components:
             required: [title]
             properties:
               title: { type: string }
+              category: { $ref: "#/components/schemas/InvitationCategory" }
               when: { type: string, format: date-time }
               tags: { type: array, items: { type: string } }
 

@@ -131,8 +131,13 @@ export class VillageService {
     const upcomingInvitations = onTorget
       .filter((post) => post.kind === "invitasjon")
       .sort((a, b) => (a.when ?? a.lastDay).localeCompare(b.when ?? b.lastDay))
-      .slice(0, 5)
-      .map((post) => ({ title: post.title, ...(post.when ? { when: post.when } : {}), tags: post.tags }));
+      .slice(0, 8)
+      .map((post) => ({
+        title: post.title,
+        ...(post.category ? { category: post.category } : {}),
+        ...(post.when ? { when: post.when } : {}),
+        tags: post.tags,
+      }));
     return { postsOnTorget: onTorget.length, upcomingInvitations };
   }
 
