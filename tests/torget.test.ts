@@ -69,6 +69,20 @@ describe("Et nytt innlegg", () => {
     assert.equal(readNewPost({ kind: "info", title: "x", lastDay: addDays(TODAY, 90) }, TODAY, osloDay).ok, true);
   });
 
+  test("en invitasjon har en kategori, standard er «annet»; andre innlegg har ingen", () => {
+    const tur = readNewPost({ kind: "invitasjon", category: "tur", title: "Tur" }, TODAY, osloDay);
+    assert.ok(tur.ok);
+    assert.equal(tur.value.category, "tur");
+    const plain = readNewPost({ kind: "invitasjon", title: "Fest" }, TODAY, osloDay);
+    assert.ok(plain.ok);
+    assert.equal(plain.value.category, "annet");
+    assert.deepEqual(readNewPost({ kind: "invitasjon", category: "fest", title: "Fest" }, TODAY, osloDay), { ok: false, error: "Velg hva du inviterer til." });
+    assert.deepEqual(readNewPost({ kind: "hjelp", category: "tur", title: "Skyss" }, TODAY, osloDay), { ok: false, error: "Bare en invitasjon har kategori." });
+    const help = readNewPost({ kind: "hjelp", title: "Skyss" }, TODAY, osloDay);
+    assert.ok(help.ok);
+    assert.equal("category" in help.value, false);
+  });
+
   test("bare en forespørsel om hjelp kan være diskret", () => {
     const help = readNewPost({ kind: "hjelp", title: "Handling", discreet: true }, TODAY, osloDay);
     assert.ok(help.ok);
@@ -109,6 +123,9 @@ describe("Torget", () => {
 
   test("filtrering på type og tagg", () => {
     const kari = { userId: "kari", role: "medlem" as const };
+    // «tur» has no category: it counts as «annet»
+    assert.deepEqual(torget(posts, { category: "annet" }, kari, TODAY).map((p) => p.id), ["tur"]);
+    assert.deepEqual(torget(posts, { category: "tur" }, kari, TODAY).map((p) => p.id), []);
     assert.deepEqual(torget(posts, { kind: "info" }, kari, TODAY).map((p) => p.id), ["info"]);
     assert.deepEqual(torget(posts, { tag: "tur" }, kari, TODAY).map((p) => p.id), ["tur", "info"]);
     assert.deepEqual(tagsInUse(torget(posts, {}, kari, TODAY)), ["tur", "funnet"]);

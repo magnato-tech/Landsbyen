@@ -20,7 +20,7 @@ import {
   torget,
   type PostFilter,
 } from "./domain/torget.ts";
-import { POST_KINDS, type Application, type Member, type Message, type Post, type PostKind, type PostResponse, type User, type Village } from "./domain/types.ts";
+import { INVITATION_CATEGORIES, POST_KINDS, type Application, type InvitationCategory, type Member, type Message, type Post, type PostKind, type PostResponse, type User, type Village } from "./domain/types.ts";
 import type { Store } from "./store/store.ts";
 
 export class ApiError extends Error {
@@ -228,13 +228,17 @@ export class VillageService {
 
   // ---------- Torget ----------
 
-  async posts(villageId: string, user: User, query: { kind?: string | null; tag?: string | null }): Promise<PostView[]> {
+  async posts(villageId: string, user: User, query: { kind?: string | null; category?: string | null; tag?: string | null }): Promise<PostView[]> {
     const village = await this.village(villageId);
     const viewer = await this.member(village, user);
     const filter: PostFilter = {};
     if (query.kind) {
       if (!POST_KINDS.includes(query.kind as PostKind)) throw new ApiError(400, "Ukjent type innlegg.");
       filter.kind = query.kind as PostKind;
+    }
+    if (query.category) {
+      if (!INVITATION_CATEGORIES.includes(query.category as InvitationCategory)) throw new ApiError(400, "Ukjent kategori.");
+      filter.category = query.category as InvitationCategory;
     }
     if (query.tag) filter.tag = query.tag.toLocaleLowerCase("nb").replace(/^#/, "");
     const [posts, responses] = await Promise.all([this.store.listPosts(villageId), this.store.listResponses(villageId)]);

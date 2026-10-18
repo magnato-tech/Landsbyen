@@ -137,6 +137,12 @@ form button[type="submit"] { margin-top: 0.75rem; justify-self: start; }
 .chip .icon { width: 1.1rem; height: 1.1rem; color: var(--kind, currentColor); }
 .chip.is-on .icon { color: inherit; }
 .composer h2 { display: flex; align-items: center; gap: 0.5rem; }
+.category-picks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; margin-top: 0.25rem; }
+.category-pick { display: flex; align-items: center; gap: 0.6rem; text-align: left; padding: 0.75rem 0.8rem; min-height: 3.4rem; border-radius: 6px; border: 1.5px solid color-mix(in srgb, var(--kind) 40%, var(--line)); background: color-mix(in srgb, var(--kind) 7%, var(--surface)); font-weight: 700; cursor: pointer; }
+.category-pick:hover { background: color-mix(in srgb, var(--kind) 15%, var(--surface)); }
+.category-pick .icon { width: 1.9rem; height: 1.9rem; color: var(--kind); }
+.category-pick:last-child:nth-child(odd) { grid-column: 1 / -1; }
+.filters.sub { margin-top: -0.6rem; padding-left: 0.75rem; border-left: 2px solid color-mix(in srgb, var(--oker) 45%, var(--line)); }
 .composer h2 .icon { color: var(--kind); width: 1.6rem; height: 1.6rem; }
 .discreet { font-weight: 700; color: var(--surface); background: var(--hav); border-radius: 3px; padding: 0 0.4rem; font-size: 0.8rem; }
 .post h3 { font-size: var(--step-1); font-weight: 700; }

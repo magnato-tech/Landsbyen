@@ -45,7 +45,7 @@ describe("Uten innlogging", () => {
 
     const preview = await call(null, "GET", `${V}/preview`);
     assert.equal(preview.status, 200);
-    assert.equal(preview.body.postsOnTorget, 5);
+    assert.equal(preview.body.postsOnTorget, 7);
     assert.deepEqual(Object.keys(preview.body.upcomingInvitations[0]).sort(), ["tags", "title", "when"]);
     assert.ok(!JSON.stringify(preview.body).includes("Nordmann"));
   });
@@ -151,6 +151,12 @@ describe("Torget", () => {
     assert.equal((await call("sara", "DELETE", `${V}/posts/innlegg-tur`)).status, 403);
     assert.equal((await call("anne", "DELETE", `${V}/posts/innlegg-tur`)).status, 204);
     assert.equal((await call("kari", "GET", `${V}/posts/innlegg-tur`)).status, 404);
+  });
+
+  test("invitasjonene kan snevres inn til én kategori", async () => {
+    const turer = (await call("kari", "GET", `${V}/posts?kind=invitasjon&category=aktivitet`)).body;
+    assert.deepEqual(turer.map((p: { title: string; category: string }) => [p.title, p.category]), [["Fotball for alle på løkka", "aktivitet"]]);
+    assert.equal((await call("kari", "GET", `${V}/posts?category=fest`)).status, 400);
   });
 
   test("feil i et innlegg sies på norsk", async () => {

@@ -90,7 +90,7 @@ export function createApp(options: AppOptions): Server {
       service.reject(params.villageId, params.applicationId, user(), body)
     ),
     route("GET", `${v}/posts`, async ({ params, user, query }) =>
-      service.posts(params.villageId, user(), { kind: query.get("kind"), tag: query.get("tag") })
+      service.posts(params.villageId, user(), { kind: query.get("kind"), category: query.get("category"), tag: query.get("tag") })
     ),
     route("POST", `${v}/posts`, async ({ params, user, body }) => service.createPost(params.villageId, user(), body), 201),
     route("GET", `${v}/tags`, async ({ params, user }) => service.tags(params.villageId, user())),

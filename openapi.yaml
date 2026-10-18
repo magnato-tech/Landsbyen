@@ -207,6 +207,10 @@ paths:
         - name: kind
           in: query
           schema: { $ref: "#/components/schemas/PostKind" }
+        - name: category
+          in: query
+          description: Bare invitasjoner til dette
+          schema: { $ref: "#/components/schemas/InvitationCategory" }
         - name: tag
           in: query
           schema: { type: string }
@@ -551,6 +555,14 @@ components:
       type: string
       enum: [invitasjon, hjelp, tilbud, info]
 
+    InvitationCategory:
+      type: string
+      enum: [tur, mat, aktivitet, samling, annet]
+      description: |
+        Hva en invitasjon gjelder, valgt med et symbol før skjemaet åpnes:
+        tur og friluft, mat og kaffe, aktivitet og fritid, samling, eller annet.
+        Bare invitasjoner har kategori.
+
     Answer:
       type: string
       enum: [blir-med, kan-hjelpe, onsker]
@@ -561,6 +573,9 @@ components:
       required: [kind, title]
       properties:
         kind: { $ref: "#/components/schemas/PostKind" }
+        category:
+          allOf: [{ $ref: "#/components/schemas/InvitationCategory" }]
+          description: Bare for invitasjoner. Standard er «annet»
         title: { type: string, minLength: 1, maxLength: 80 }
         body: { type: string, maxLength: 600 }
         tags:
@@ -595,6 +610,7 @@ components:
         id: { type: string }
         villageId: { type: string }
         kind: { $ref: "#/components/schemas/PostKind" }
+        category: { $ref: "#/components/schemas/InvitationCategory" }
         title: { type: string }
         body: { type: string }
         tags: { type: array, items: { type: string } }

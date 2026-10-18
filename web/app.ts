@@ -2,11 +2,11 @@
 // village is stored; every list and every check comes from the API (api.ts).
 
 import { addDays, dayIn, momentIn } from "../src/domain/days.ts";
-import { KIND_INFO } from "../src/domain/torget.ts";
-import type { Application, Message, PostKind, Role, User, Village } from "../src/domain/types.ts";
+import { CATEGORY_NAMES, KIND_INFO } from "../src/domain/torget.ts";
+import { INVITATION_CATEGORIES, type Application, type InvitationCategory, type Message, type PostKind, type Role, type User, type Village } from "../src/domain/types.ts";
 import type { PostView } from "../src/service.ts";
 import type { Conversation, LandsbyApi, Me, MemberView, Preview } from "./api.ts";
-import { KIND_ICONS } from "./icons.ts";
+import { CATEGORY_ICONS, KIND_ICONS } from "./icons.ts";
 
 type Tab = "torget" | "samtaler" | "vert";
 
@@ -23,6 +23,8 @@ interface State {
   role: Role | null;
   tab: Tab;
   kind: PostKind | null;
+  /** Narrows the invitations to one category; only while the invitations are shown. */
+  category: InvitationCategory | null;
   tag: string | null;
   posts: PostView[];
   preview: Preview | null;
@@ -30,6 +32,8 @@ interface State {
   applications: Application[];
   members: MemberView[];
   composing: PostKind | null;
+  /** For an invitation: what it is to, chosen before the form opens. */
+  composingCategory: InvitationCategory | null;
   thread: Thread | null;
   threadMessages: Message[];
   confirmDelete: string | null;
@@ -64,7 +68,7 @@ const FORM_TITLES: Record<PostKind, string> = {
   info: "Del noe med landsbyen",
 };
 const TITLE_HINTS: Record<PostKind, string> = {
-  invitasjon: "For eksempel: Kaffe etter gudstjenesten",
+  invitasjon: "For eksempel: Søndagstur til utsiktspunktet",
   hjelp: "For eksempel: Trenger skyss til legen torsdag",
   tilbud: "For eksempel: Har tilhenger til utlån",
   info: "For eksempel: Funnet lue ved skolen",
@@ -78,6 +82,7 @@ export function startApp(options: AppOptions): void {
     role: null,
     tab: "torget",
     kind: null,
+    category: null,
     tag: null,
     posts: [],
     preview: null,
@@ -85,6 +90,7 @@ export function startApp(options: AppOptions): void {
     applications: [],
     members: [],
     composing: null,
+    composingCategory: null,
     thread: null,
     threadMessages: [],
     confirmDelete: null,
@@ -152,7 +158,7 @@ export function startApp(options: AppOptions): void {
 
   async function loadTab(): Promise<void> {
     if (state.tab === "torget") {
-      state.posts = await api.posts({ kind: state.kind ?? undefined, tag: state.tag ?? undefined });
+      state.posts = await api.posts({ kind: state.kind ?? undefined, category: state.category ?? undefined, tag: state.tag ?? undefined });
     }
     if (state.tab === "samtaler") state.conversations = await api.conversations();
     if (state.tab === "vert") {
@@ -245,10 +251,24 @@ export function startApp(options: AppOptions): void {
         )
       )
       .join("");
+    // With the invitations shown, what they are to can narrow them further
+    const categories =
+      state.kind === "invitasjon"
+        ? `<div class="filters sub" role="group" aria-label="Invitasjoner til">${[
+            `<button type="button" class="chip kind-invitasjon ${!state.category ? "is-on" : ""}" data-action="category" data-category="">Alle invitasjoner</button>`,
+          ]
+            .concat(
+              INVITATION_CATEGORIES.filter((c) => c !== "annet").map(
+                (c) =>
+                  `<button type="button" class="chip kind-invitasjon ${state.category === c ? "is-on" : ""}" data-action="category" data-category="${c}">${CATEGORY_ICONS[c]}<span>${esc(CATEGORY_NAMES[c])}</span></button>`
+              )
+            )
+            .join("")}</div>`
+        : "";
     const tag = state.tag
       ? `<p class="tag-filter">Viser innlegg merket <strong>#${esc(state.tag)}</strong> <button type="button" class="link" data-action="tag" data-tag="">Vis alle</button></p>`
       : "";
-    return `<div class="filters" role="group" aria-label="Vis">${kinds}</div>${tag}`;
+    return `<div class="filters" role="group" aria-label="Vis">${kinds}</div>${categories}${tag}`;
   }
 
   function composer(): string {
@@ -262,10 +282,26 @@ export function startApp(options: AppOptions): void {
       </div>`;
     }
     const invitation = kind === "invitasjon";
+    // An invitation says what it is to before anything else: one tap on a symbol
+    if (invitation && !state.composingCategory) {
+      return `<div class="composer kind-invitasjon">
+        <div class="composer-head">
+          <h2>${KIND_ICONS.invitasjon}<span>Hva inviterer du til?</span></h2>
+          <button type="button" class="link" data-action="compose" data-kind="">Avbryt</button>
+        </div>
+        <div class="category-picks">${INVITATION_CATEGORIES.map(
+          (c) =>
+            `<button type="button" class="category-pick" data-action="pickcategory" data-category="${c}">${CATEGORY_ICONS[c]}<span>${esc(CATEGORY_NAMES[c])}</span></button>`
+        ).join("")}</div>
+      </div>`;
+    }
+    const heading = invitation && state.composingCategory
+      ? `${CATEGORY_ICONS[state.composingCategory]}<span>${esc(state.composingCategory === "annet" ? "Inviter til noe" : CATEGORY_NAMES[state.composingCategory])}</span>`
+      : `${KIND_ICONS[kind]}<span>${esc(FORM_TITLES[kind])}</span>`;
     return `<form class="composer kind-${kind}" data-form="post">
       <div class="composer-head">
-        <h2>${KIND_ICONS[kind]}<span>${esc(FORM_TITLES[kind])}</span></h2>
-        <button type="button" class="link" data-action="compose" data-kind="">Avbryt</button>
+        <h2>${heading}</h2>
+        ${invitation ? `<button type="button" class="link" data-action="pickcategory" data-category="">Bytt kategori</button>` : `<button type="button" class="link" data-action="compose" data-kind="">Avbryt</button>`}
       </div>
       <label for="f-title">Overskrift</label>
       <input id="f-title" name="title" maxlength="80" required placeholder="${esc(TITLE_HINTS[kind])}">
@@ -335,7 +371,7 @@ export function startApp(options: AppOptions): void {
     }
 
     return `<article class="post kind-${post.kind}">
-      <p class="kind">${KIND_ICONS[post.kind]}<span>${esc(info.label)}</span>${post.discreet ? '<span class="discreet">Diskret</span>' : ""}</p>
+      <p class="kind">${post.kind === "invitasjon" ? CATEGORY_ICONS[post.category ?? "annet"] : KIND_ICONS[post.kind]}<span>${esc(post.kind === "invitasjon" && post.category && post.category !== "annet" ? CATEGORY_NAMES[post.category] : info.label)}</span>${post.discreet ? '<span class="discreet">Diskret</span>' : ""}</p>
       <h3>${esc(post.title)}</h3>
       ${when}
       ${post.body ? `<p class="body">${esc(post.body)}</p>` : ""}
@@ -489,13 +525,23 @@ export function startApp(options: AppOptions): void {
         return void attempt(loadTab);
       case "kind":
         state.kind = (kind || null) as PostKind | null;
+        state.category = null;
         return void attempt(loadTab);
+      case "category":
+        state.category = (target.dataset.category || null) as InvitationCategory | null;
+        return void attempt(loadTab);
+      case "pickcategory":
+        state.composingCategory = (target.dataset.category || null) as InvitationCategory | null;
+        render();
+        if (state.composingCategory) document.getElementById("f-title")?.focus();
+        return;
       case "tag":
         state.tag = tag || null;
         state.tab = "torget";
         return void attempt(loadTab);
       case "compose":
         state.composing = (kind || null) as PostKind | null;
+        state.composingCategory = null;
         render();
         if (state.composing) document.getElementById("f-title")?.focus();
         return;
@@ -574,6 +620,7 @@ export function startApp(options: AppOptions): void {
       const kind = state.composing;
       const input: Record<string, unknown> = {
         kind,
+        ...(kind === "invitasjon" ? { category: state.composingCategory ?? "annet" } : {}),
         title: text("title"),
         body: text("body"),
         tags: text("tags") ? [text("tags")] : [],
@@ -585,7 +632,9 @@ export function startApp(options: AppOptions): void {
       return void attempt(async () => {
         await api.createPost(input);
         state.composing = null;
+        state.composingCategory = null;
         state.kind = null;
+        state.category = null;
         state.tag = null;
         await loadTab();
       }, input.discreet ? "Forespørselen er sendt diskret til landsbyvertene." : "Innlegget står på torget.");

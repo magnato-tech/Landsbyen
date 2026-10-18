@@ -20,7 +20,7 @@ export interface LandsbyApi {
   applications(): Promise<Application[]>;
   approve(applicationId: string, input: { role: "landsbyboer" | "medlem"; welcome?: string }): Promise<MemberView>;
   reject(applicationId: string): Promise<Application>;
-  posts(query: { kind?: string; tag?: string }): Promise<PostView[]>;
+  posts(query: { kind?: string; category?: string; tag?: string }): Promise<PostView[]>;
   createPost(input: Record<string, unknown>): Promise<PostView>;
   closePost(postId: string): Promise<PostView>;
   deletePost(postId: string): Promise<void>;

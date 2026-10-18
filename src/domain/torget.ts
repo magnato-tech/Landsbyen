@@ -2,7 +2,7 @@
 // who sees it, what answering means and who may write to whom – so the API, the tests and a
 // later client (or Menighetsplan) all ask the same questions and get the same answers.
 
-import { POST_KINDS, type Answer, type Message, type Post, type PostKind, type PostResponse, type Role } from "./types.ts";
+import { INVITATION_CATEGORIES, POST_KINDS, type Answer, type InvitationCategory, type Message, type Post, type PostKind, type PostResponse, type Role } from "./types.ts";
 import { addDays, isIsoDay } from "./days.ts";
 
 export interface KindInfo {
@@ -19,6 +19,15 @@ export const KIND_INFO: Record<PostKind, KindInfo> = {
   hjelp: { label: "Be om hjelp", action: "Jeg kan hjelpe", answer: "kan-hjelpe", answeredAs: (n) => `${n} kan hjelpe` },
   tilbud: { label: "Tilbyr hjelp", action: "Ja takk", answer: "onsker", answeredAs: (n) => `${n} vil gjerne` },
   info: { label: "Til info", action: null, answer: null, answeredAs: (n) => n },
+};
+
+/** The names of an invitation's categories, as the choice and the post show them. */
+export const CATEGORY_NAMES: Record<InvitationCategory, string> = {
+  tur: "Tur og friluft",
+  mat: "Mat og kaffe",
+  aktivitet: "Aktivitet og fritid",
+  samling: "Samling",
+  annet: "Annet",
 };
 
 export const TITLE_MAX = 80;
@@ -52,7 +61,7 @@ export function cleanTags(values: readonly unknown[]): string[] {
   return tags;
 }
 
-export type PostFields = Pick<Post, "kind" | "title" | "body" | "tags" | "when" | "place" | "lastDay" | "discreet">;
+export type PostFields = Pick<Post, "kind" | "category" | "title" | "body" | "tags" | "when" | "place" | "lastDay" | "discreet">;
 
 const isString = (value: unknown): value is string => typeof value === "string";
 
@@ -95,8 +104,19 @@ export function readNewPost(input: unknown, today: string, dayOf: (moment: strin
 
   if (data.discreet === true && kind !== "hjelp") return fail("Bare en forespørsel om hjelp kan være diskret.");
 
+  // An invitation says what it is to; one sent without a category is «annet»
+  let category: InvitationCategory | undefined;
+  if (kind === "invitasjon") {
+    const asked = data.category ?? "annet";
+    if (!INVITATION_CATEGORIES.includes(asked as InvitationCategory)) return fail("Velg hva du inviterer til.");
+    category = asked as InvitationCategory;
+  } else if (data.category !== undefined && data.category !== null) {
+    return fail("Bare en invitasjon har kategori.");
+  }
+
   const fields: PostFields = {
     kind: kind as PostKind,
+    ...(category ? { category } : {}),
     title,
     body,
     tags: cleanTags((data.tags as unknown[] | undefined) ?? []),
@@ -122,6 +142,8 @@ export const mayManagePost = (post: Pick<Post, "authorId">, userId: string, role
 
 export interface PostFilter {
   kind?: PostKind;
+  /** An invitation's category. Asks for invitations of that category only. */
+  category?: InvitationCategory;
   tag?: string;
 }
 
@@ -133,6 +155,7 @@ export function torget(posts: readonly Post[], filter: PostFilter, viewer: { use
     .filter((post) => isOnTorget(post, today))
     .filter((post) => maySeePost(post, viewer.userId, viewer.role))
     .filter((post) => !filter.kind || post.kind === filter.kind)
+    .filter((post) => !filter.category || (post.kind === "invitasjon" && (post.category ?? "annet") === filter.category))
     .filter((post) => !filter.tag || post.tags.includes(filter.tag))
     .sort(newestFirst);
 }

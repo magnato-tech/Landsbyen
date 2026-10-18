@@ -65,6 +65,10 @@ export interface Application {
 export const POST_KINDS = ["invitasjon", "hjelp", "tilbud", "info"] as const;
 export type PostKind = (typeof POST_KINDS)[number];
 
+/** What an invitation is to. Only invitations have one; the other kinds have one symbol each. */
+export const INVITATION_CATEGORIES = ["tur", "mat", "aktivitet", "samling", "annet"] as const;
+export type InvitationCategory = (typeof INVITATION_CATEGORIES)[number];
+
 export const ANSWERS = ["blir-med", "kan-hjelpe", "onsker"] as const;
 export type Answer = (typeof ANSWERS)[number];
 
@@ -72,6 +76,8 @@ export interface Post {
   id: string;
   villageId: string;
   kind: PostKind;
+  /** On an invitation only: what it is to. */
+  category?: InvitationCategory;
   title: string;
   body: string;
   /** Lower case, without «#», at most five. */
