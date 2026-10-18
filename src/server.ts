@@ -16,6 +16,7 @@ import { createApp } from "./http/app.ts";
 import { DEMO_USERS, DEMO_VILLAGE_ID, seedDemo } from "./seed.ts";
 import { VillageService } from "./service.ts";
 import { FirestoreStore } from "./store/firestoreStore.ts";
+import { fileKeeper } from "./store/fileKeeper.ts";
 import { MemoryStore } from "./store/memoryStore.ts";
 import type { Store } from "./store/store.ts";
 
@@ -38,7 +39,7 @@ if (storeKind === "firestore") {
     accessToken: env.GOOGLE_ACCESS_TOKEN,
   });
 } else if (storeKind === "memory") {
-  store = new MemoryStore(env.DATA_FILE);
+  store = new MemoryStore(env.DATA_FILE ? fileKeeper(env.DATA_FILE) : undefined);
 } else {
   fail(`ukjent STORE «${storeKind}».`);
 }

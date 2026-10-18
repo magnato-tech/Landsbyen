@@ -1,7 +1,7 @@
 // A made-up village to try the concept with: the place, the congregation and every person are
 // invented. Dates are counted from today, so the torget always looks alive.
 
-import { addDays, dayIn } from "./domain/days.ts";
+import { addDays, dayIn, momentIn as at } from "./domain/days.ts";
 import type { Application, Member, Message, Post, PostResponse, User, Village } from "./domain/types.ts";
 import type { Store } from "./store/store.ts";
 
@@ -15,15 +15,6 @@ export const DEMO_USERS: User[] = [
   { id: "per", name: "Per Nabo", email: "per@eksempel.no" },
   { id: "jonas", name: "Jonas Ny", email: "jonas@eksempel.no" },
 ];
-
-/** A local date and clock time in the village's zone, as an exact moment. Good enough for test data. */
-function at(day: string, clock: string, timeZone: string): string {
-  const guess = new Date(`${day}T${clock}:00Z`);
-  const shown = new Intl.DateTimeFormat("en-GB", { timeZone, hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(guess);
-  const [h, m] = shown.split(":").map(Number);
-  const [wantH, wantM] = clock.split(":").map(Number);
-  return new Date(guess.getTime() - ((h - wantH) * 60 + (m - wantM)) * 60_000).toISOString();
-}
 
 export async function seedDemo(store: Store, now: number = Date.now()): Promise<void> {
   const timeZone = "Europe/Oslo";

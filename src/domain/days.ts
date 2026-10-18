@@ -16,3 +16,23 @@ export function dayIn(timeZone: string, moment: number | string = Date.now()): s
 export function addDays(day: string, days: number): string {
   return new Date(Date.parse(`${day}T12:00:00Z`) + days * 86_400_000).toISOString().slice(0, 10);
 }
+
+/**
+ * A clock time on a calendar day in a time zone, as an exact moment: «11:00 on 24 October in
+ * Oslo» is 09:00 UTC in summer time and 10:00 in winter time. Used by the web client and the
+ * test data; the API itself only accepts moments that already carry their zone.
+ */
+export function momentIn(day: string, clock: string, timeZone: string): string {
+  const [wantH, wantM] = clock.split(":").map(Number);
+  let guess = Date.parse(`${day}T${clock}:00Z`);
+  // Two rounds settle it, also on the day the clocks change
+  for (let round = 0; round < 2; round++) {
+    const parts = new Intl.DateTimeFormat("en-GB", { timeZone, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23" })
+      .formatToParts(new Date(guess))
+      .reduce<Record<string, string>>((all, part) => ({ ...all, [part.type]: part.value }), {});
+    const shown = Date.parse(`${parts.year}-${parts.month}-${parts.day}T${parts.hour}:${parts.minute}:00Z`);
+    const wanted = Date.parse(`${day}T${String(wantH).padStart(2, "0")}:${String(wantM).padStart(2, "0")}:00Z`);
+    guess += wanted - shown;
+  }
+  return new Date(guess).toISOString();
+}

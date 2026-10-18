@@ -1,0 +1,317 @@
+<title>Landsbyen</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Literata:opsz,wght@7..72,500;7..72,700&display=swap">
+<style>
+/* Layout: one phone-width column under a pine-green band where the village's roofline (with its church) stands on the edge. */
+:root {
+  --fjord: #edf2ef;      /* page */
+  --surface: #ffffff;    /* posts, forms */
+  --ink: #17231e;
+  --muted: #52615a;
+  --line: #cfdad4;
+  --skog: #1f5a45;       /* the band, primary buttons */
+  --skog-ink: #f3f7f4;   /* text on the band */
+  --roof: #2f7a5f;       /* houses on the band */
+  --roof-church: #e9efe9;
+  --oker: #9a6a07;       /* invitation */
+  --hav: #255f8f;        /* help */
+  --lyng: #77468c;       /* offer */
+  --stein: #5c6762;      /* info */
+  --action: #1f5a45;     /* primary buttons, chosen filter, own messages */
+  --action-ink: #f3f7f4;
+  --danger: #a3341f;
+  --focus: #e0a412;
+  --font-display: "Literata", Georgia, "Times New Roman", serif;
+  --font-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --step-0: 1.0625rem;
+  --step-1: 1.25rem;
+  --step-2: 1.6rem;
+  --step-3: 2.1rem;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --fjord: #101a16; --surface: #182520; --ink: #e3ece7; --muted: #9fb2a9; --line: #2b3d35;
+    --skog: #173f31; --skog-ink: #eef5f0; --roof: #24604a; --roof-church: #cfe0d6;
+    --oker: #e2b44a; --hav: #82b8e3; --lyng: #c9a0dc; --stein: #a8b3ae; --danger: #f08a73; --focus: #f2c14e; --action: #6dbb98; --action-ink: #0e1b16;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --fjord: #101a16; --surface: #182520; --ink: #e3ece7; --muted: #9fb2a9; --line: #2b3d35;
+  --skog: #173f31; --skog-ink: #eef5f0; --roof: #24604a; --roof-church: #cfe0d6;
+  --oker: #e2b44a; --hav: #82b8e3; --lyng: #c9a0dc; --stein: #a8b3ae; --danger: #f08a73; --focus: #f2c14e; --action: #6dbb98; --action-ink: #0e1b16;
+  color-scheme: dark;
+}
+
+html { -webkit-text-size-adjust: 100%; }
+body { background: var(--fjord); color: var(--ink); font-family: var(--font-body); font-size: var(--step-0); line-height: 1.5; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--skog); }
+* { box-sizing: border-box; }
+h1, h2, h3 { font-family: var(--font-display); line-height: 1.2; text-wrap: balance; margin: 0; }
+p { margin: 0; }
+button, input, textarea, select { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+/* The band */
+.top { background: var(--skog); color: var(--skog-ink); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.top-inner { max-width: 40rem; margin: 0 auto; padding-block: 1.25rem 1.25rem; display: grid; gap: 1rem; }
+.roofline { width: 100%; max-width: 100%; height: auto; display: block; order: -1; }
+.r-house path { fill: var(--roof); }
+.r-church path { fill: var(--roof-church); }
+.r-window rect { fill: var(--skog); }
+.top h1 { font-size: var(--step-3); font-weight: 700; letter-spacing: -0.01em; }
+.anchor { margin-top: 0.25rem; opacity: 0.92; }
+.anchor strong { font-weight: 700; }
+.switcher { display: grid; gap: 0.35rem; padding: 0.75rem; border-radius: 6px; background: color-mix(in srgb, var(--skog-ink) 10%, transparent); }
+.switcher label { font-size: 0.9rem; }
+.switcher select { padding: 0.5rem; border-radius: 4px; border: 1px solid color-mix(in srgb, var(--skog-ink) 40%, transparent); background: var(--surface); color: var(--ink); }
+.switcher .hint { font-size: 0.85rem; opacity: 0.85; }
+
+/* The page */
+.page { max-width: 40rem; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 1rem 4rem; display: grid; gap: 1.25rem; }
+.page > * { min-width: 0; }
+.you { color: var(--muted); font-size: 0.95rem; margin-top: -0.5rem; }
+.empty { color: var(--muted); padding: 1.25rem; border: 1px dashed var(--line); border-radius: 6px; }
+
+.tabs { display: flex; gap: 0.25rem; border-bottom: 2px solid var(--line); }
+.tabs button { background: none; border: 0; padding: 0.7rem 0.9rem; font-weight: 700; color: var(--muted); border-bottom: 3px solid transparent; margin-bottom: -2px; cursor: pointer; }
+.tabs button[aria-current="page"] { color: var(--ink); border-bottom-color: var(--action); }
+
+.notice { display: flex; gap: 1rem; justify-content: space-between; align-items: start; padding: 0.8rem 1rem; border-radius: 6px; background: color-mix(in srgb, var(--action) 12%, var(--surface)); border: 1px solid color-mix(in srgb, var(--action) 35%, var(--line)); }
+.notice.is-error { background: color-mix(in srgb, var(--danger) 10%, var(--surface)); border-color: color-mix(in srgb, var(--danger) 45%, var(--line)); }
+
+/* Kinds: each has its own colour, used on its label, its chip and its button */
+.kind-invitasjon { --kind: var(--oker); }
+.kind-hjelp { --kind: var(--hav); }
+.kind-tilbud { --kind: var(--lyng); }
+.kind-info { --kind: var(--stein); }
+
+button.primary, button.secondary { border-radius: 6px; padding: 0.7rem 1.1rem; font-weight: 700; cursor: pointer; min-height: 2.9rem; }
+button.primary { background: var(--action); color: var(--action-ink); border: 0; }
+button.primary.act { background: var(--kind); color: var(--surface); }
+button.primary:disabled { opacity: 0.6; cursor: wait; }
+button.secondary { background: var(--surface); border: 1.5px solid var(--line); }
+button.link { background: none; border: 0; padding: 0.25rem 0; color: var(--ink); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+button.link.danger { color: var(--danger); }
+
+/* Starting a post */
+.compose-start { display: grid; gap: 0.6rem; }
+.compose-start p { font-family: var(--font-display); font-size: var(--step-1); }
+.compose-kinds { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; }
+.kind-pick { text-align: left; padding: 0.8rem 0.9rem; border-radius: 6px; border: 1.5px solid color-mix(in srgb, var(--kind) 45%, var(--line)); background: color-mix(in srgb, var(--kind) 8%, var(--surface)); font-weight: 700; cursor: pointer; min-height: 3.2rem; }
+.kind-pick:hover { background: color-mix(in srgb, var(--kind) 16%, var(--surface)); }
+
+form { display: grid; gap: 0.35rem; }
+.composer, .apply { background: var(--surface); border: 1px solid var(--line); border-top: 4px solid var(--kind, var(--action)); border-radius: 6px; padding: 1rem; }
+.composer-head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; margin-bottom: 0.5rem; }
+.composer h2, .apply h2 { font-size: var(--step-1); }
+label { font-weight: 700; margin-top: 0.5rem; }
+.opt { font-weight: 400; color: var(--muted); }
+input, textarea, select { width: 100%; padding: 0.65rem 0.7rem; border: 1.5px solid var(--line); border-radius: 4px; background: var(--surface); }
+textarea { resize: vertical; }
+.row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; }
+.row > div { display: grid; gap: 0.35rem; }
+label.check { display: flex; gap: 0.6rem; align-items: start; font-weight: 400; margin-block: 0.5rem; }
+label.check input { width: 1.3rem; height: 1.3rem; margin-top: 0.15rem; flex: none; }
+form button[type="submit"] { margin-top: 0.75rem; justify-self: start; }
+
+/* Filters */
+.filters { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.chip { border: 1.5px solid var(--line); background: var(--surface); border-radius: 999px; padding: 0.35rem 0.85rem; cursor: pointer; font-size: 0.95rem; }
+.chip.is-on { background: var(--kind, var(--action)); border-color: var(--kind, var(--action)); color: var(--surface); font-weight: 700; }
+.chip.is-on:not([class*="kind-"]) { color: var(--action-ink); }
+.tag-filter { color: var(--muted); }
+
+/* Posts */
+.posts { display: grid; gap: 0.9rem; }
+.post { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 1rem 1rem 1.1rem; display: grid; gap: 0.5rem; }
+.post .kind { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; font-size: 0.9rem; color: var(--kind); }
+.post .kind::before { content: ""; width: 0.95rem; height: 0.95rem; background: var(--kind); clip-path: polygon(50% 0, 100% 45%, 100% 100%, 0 100%, 0 45%); }
+.discreet { font-weight: 700; color: var(--surface); background: var(--hav); border-radius: 3px; padding: 0 0.4rem; font-size: 0.8rem; }
+.post h3 { font-size: var(--step-1); font-weight: 700; }
+.when { font-weight: 700; }
+.body { max-width: 62ch; }
+.tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.tag { background: none; border: 0; padding: 0; color: var(--kind); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; font-size: 0.95rem; }
+.note { font-size: 0.95rem; color: var(--hav); }
+.by { font-size: 0.9rem; color: var(--muted); }
+.answers { font-weight: 700; color: var(--kind); }
+.actions { display: flex; flex-wrap: wrap; gap: 0.6rem 1rem; align-items: center; margin-top: 0.35rem; }
+.answered { flex-basis: 100%; font-weight: 700; color: var(--kind); }
+.responders { display: flex; flex-wrap: wrap; gap: 0.5rem; flex-basis: 100%; }
+.manage { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; }
+.confirm { display: inline-flex; gap: 0.6rem; align-items: center; }
+
+/* Conversations */
+.conversations { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
+.conversations button { width: 100%; text-align: left; display: grid; gap: 0.15rem; padding: 0.85rem 1rem; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; cursor: pointer; }
+.conversations .about, .conversations .ago { color: var(--muted); font-size: 0.9rem; }
+.conversations .last { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.thread-backdrop { position: fixed; inset: 0; background: color-mix(in srgb, var(--ink) 45%, transparent); z-index: 20; }
+.thread { position: fixed; z-index: 21; left: 0; right: 0; bottom: 0; max-height: 85%; margin: 0 auto; max-width: 40rem; background: var(--surface); border-radius: 12px 12px 0 0; display: grid; grid-template-rows: auto 1fr auto; padding: 1rem max(16px, env(safe-area-inset-right, 0px)) calc(1rem + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+.thread-head { display: flex; justify-content: space-between; align-items: start; gap: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--line); }
+.thread-head h2 { font-size: var(--step-1); }
+.thread-head p { color: var(--muted); font-size: 0.95rem; }
+.messages { list-style: none; margin: 0; padding: 1rem 0; display: flex; flex-direction: column; gap: 0.6rem; overflow-y: auto; min-height: 8rem; }
+.messages li { max-width: 85%; align-self: flex-start; display: grid; gap: 0.2rem; }
+.messages li p { background: var(--fjord); border-radius: 10px 10px 10px 2px; padding: 0.55rem 0.8rem; }
+.messages li.from-me { align-self: flex-end; text-align: right; }
+.messages li.from-me p { background: var(--action); color: var(--action-ink); border-radius: 10px 10px 2px 10px; text-align: left; }
+.messages li span { font-size: 0.8rem; color: var(--muted); }
+.messages li.first { color: var(--muted); max-width: none; }
+.say { grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 0.5rem; }
+.say button { margin-top: 0; }
+
+/* Hosts */
+section { display: grid; gap: 0.75rem; }
+section > h2 { font-size: var(--step-1); }
+.application { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 1rem; display: grid; gap: 0.4rem; }
+.application h3 { font-size: var(--step-1); }
+.meta { color: var(--muted); font-size: 0.95rem; }
+.members { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.members li { display: flex; justify-content: space-between; gap: 1rem; padding: 0.6rem 0; border-bottom: 1px solid var(--line); }
+.role { font-size: 0.9rem; color: var(--muted); }
+.role-vert { color: var(--action); font-weight: 700; }
+
+/* Before joining */
+.intro .lead { font-family: var(--font-display); font-size: var(--step-1); line-height: 1.45; max-width: 60ch; }
+.count { font-weight: 700; }
+.teaser { margin: 0; padding: 0; list-style: none; display: grid; gap: 0.5rem; }
+.teaser li { display: grid; padding: 0.7rem 0.9rem; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; }
+.teaser span { color: var(--muted); font-size: 0.95rem; }
+.rules { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.3rem; }
+.waiting { background: var(--surface); border: 1px solid var(--line); border-top: 4px solid var(--action); border-radius: 6px; padding: 1rem; display: grid; gap: 0.4rem; }
+.waiting h2 { font-size: var(--step-1); }
+
+@media (min-width: 40rem) {
+  .top-inner { grid-template-columns: 1fr auto; align-items: end; }
+  .roofline { grid-column: 1 / -1; }
+  .switcher { min-width: 15rem; }
+  .compose-kinds { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .thread { bottom: 2rem; border-radius: 12px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .thread { animation: rise 160ms ease-out; }
+  @keyframes rise { from { transform: translateY(1.5rem); opacity: 0.6; } }
+}
+</style>
+<div id="app"></div>
+<script type="module">var Ke=/^\d{4}-\d{2}-\d{2}$/,Q=a=>Ke.test(a)&&!Number.isNaN(Date.parse(`${a}T12:00:00Z`))&&new Date(`${a}T12:00:00Z`).toISOString().startsWith(a);function D(a,t=Date.now()){let n=typeof t=="string"?new Date(t):new Date(t);return new Intl.DateTimeFormat("en-CA",{timeZone:a,year:"numeric",month:"2-digit",day:"2-digit"}).format(n)}function $(a,t){return new Date(Date.parse(`${a}T12:00:00Z`)+t*864e5).toISOString().slice(0,10)}function N(a,t,n){let[e,s]=t.split(":").map(Number),o=Date.parse(`${a}T${t}:00Z`);for(let r=0;r<2;r++){let l=new Intl.DateTimeFormat("en-GB",{timeZone:n,year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).formatToParts(new Date(o)).reduce((h,f)=>({...h,[f.type]:f.value}),{}),m=Date.parse(`${l.year}-${l.month}-${l.day}T${l.hour}:${l.minute}:00Z`),p=Date.parse(`${a}T${String(e).padStart(2,"0")}:${String(s).padStart(2,"0")}:00Z`);o+=p-m}return new Date(o).toISOString()}var L="eksempelby",B=[{id:"anne",name:"Anne Vertsen",email:"anne@eksempel.no"},{id:"kari",name:"Kari Nordmann",email:"kari@eksempel.no"},{id:"ola",name:"Ola Nordmann",email:"ola@eksempel.no"},{id:"sara",name:"Sara Innflytter",email:"sara@eksempel.no"},{id:"per",name:"Per Nabo",email:"per@eksempel.no"},{id:"jonas",name:"Jonas Ny",email:"jonas@eksempel.no"}];async function ee(a,t=Date.now()){let n="Europe/Oslo",e=D(n,t),s=k=>new Date(t-k*36e5).toISOString(),o=new Date(`${e}T12:00:00Z`).getUTCDay(),r=$(e,(6-o+7)%7||7),l={id:L,name:"Landsbyen på Eksempelby",anchor:{type:"menighet",name:"Eksempelby menighet",website:"https://eksempel.no"},description:"Et felles torg for alle som bor på Eksempelby. Her inviterer vi hverandre, ber om hjelp og hjelper hverandre. Landsbyen drives av Eksempelby menighet, og alle naboer er velkomne.",rules:["Vi bruker ekte navn.","Vi er gjestfrie, og møter hverandre med respekt.","Det som deles privat, blir mellom oss.","Torget er ikke for salg, reklame eller verving.","Landsbyvertene kan fjerne innlegg som bryter med levereglene."],area:"Eksempelby og omegn",timeZone:n};await a.putVillage(l);let m=[{villageId:l.id,userId:"anne",name:"Anne Vertsen",role:"vert",joinedAt:s(1440)},{villageId:l.id,userId:"kari",name:"Kari Nordmann",role:"medlem",joinedAt:s(1200),area:"Sentrum"},{villageId:l.id,userId:"ola",name:"Ola Nordmann",role:"medlem",joinedAt:s(1200),area:"Sentrum"},{villageId:l.id,userId:"sara",name:"Sara Innflytter",role:"landsbyboer",joinedAt:s(144),area:"Bakken"}];for(let k of m)await a.putMember(k);let p={id:"soknad-per",villageId:l.id,userId:"per",name:"Per Nabo",area:"Bakken",connection:"Bor i nabohuset til Sara, og har hørt om landsbyen fra henne.",status:"venter",appliedAt:s(5)};await a.putApplication(p);let h=[{id:"innlegg-tur",villageId:l.id,kind:"invitasjon",title:"Lørdagstur rundt vannet",body:"Vi går en rolig runde på rundt fem kilometer. Ta med kaffe og godt humør. Barn og hunder er velkomne.",tags:["tur","barn"],when:N(r,"11:00",n),place:"Parkeringen ved vannet",lastDay:r,discreet:!1,authorId:"kari",authorName:"Kari Nordmann",createdAt:s(20)},{id:"innlegg-skyss",villageId:l.id,kind:"hjelp",title:"Skyss til legen torsdag",body:"Jeg trenger skyss til legekontoret torsdag formiddag, og hjem igjen etterpå.",tags:["skyss"],lastDay:$(e,4),discreet:!1,authorId:"ola",authorName:"Ola Nordmann",createdAt:s(9)},{id:"innlegg-handling",villageId:l.id,kind:"hjelp",title:"Hjelp med handling noen uker",body:"Jeg er sykmeldt etter en operasjon og kan ikke bære. Kunne noen handle for meg en gang i uka?",tags:["handling"],lastDay:$(e,14),discreet:!0,authorId:"sara",authorName:"Sara Innflytter",createdAt:s(3)},{id:"innlegg-barnevakt",villageId:l.id,kind:"tilbud",title:"Kan være barnevakt på kveldstid",body:"Jeg er student og har god tid på kveldene. Gi en lyd om dere trenger barnevakt.",tags:["barn","barnevakt"],lastDay:$(e,30),discreet:!1,authorId:"sara",authorName:"Sara Innflytter",createdAt:s(30)},{id:"innlegg-middag",villageId:l.id,kind:"invitasjon",title:"Middag for nye i nabolaget",body:"Er du ny i nabolaget? Bli med på enkel middag hjemme hos oss. Vi lager suppe til åtte.",tags:["middag","ny-her"],when:N($(r,4),"18:00",n),place:"Hjemme hos Anne",lastDay:$(r,4),discreet:!1,authorId:"anne",authorName:"Anne Vertsen",createdAt:s(48)},{id:"innlegg-nokkel",villageId:l.id,kind:"info",title:"Funnet nøkkelknippe ved butikken",body:"Tre nøkler med en rød brikke. Ligger hos meg til eieren melder seg.",tags:["funnet"],lastDay:$(e,7),discreet:!1,authorId:"ola",authorName:"Ola Nordmann",createdAt:s(2)}];for(let k of h)await a.putPost(k);let f=[{villageId:l.id,postId:"innlegg-tur",userId:"sara",name:"Sara Innflytter",answer:"blir-med",at:s(18)},{villageId:l.id,postId:"innlegg-tur",userId:"anne",name:"Anne Vertsen",answer:"blir-med",at:s(15)},{villageId:l.id,postId:"innlegg-skyss",userId:"kari",name:"Kari Nordmann",answer:"kan-hjelpe",at:s(7)},{villageId:l.id,postId:"innlegg-middag",userId:"sara",name:"Sara Innflytter",answer:"blir-med",at:s(40)}];for(let k of f)await a.putResponse(k);let A=[{id:"melding-1",villageId:l.id,postId:"innlegg-skyss",fromId:"ola",fromName:"Ola Nordmann",toId:"kari",text:"Tusen takk, Kari! Timen er klokka 10. Kan du hente meg halv ti?",at:s(6)},{id:"melding-2",villageId:l.id,postId:"innlegg-skyss",fromId:"kari",fromName:"Kari Nordmann",toId:"ola",text:"Det passer fint. Jeg står utenfor halv ti.",at:s(5)}];for(let k of A)await a.putMessage(k)}var K=["invitasjon","hjelp","tilbud","info"];var x={invitasjon:{label:"Invitasjon",action:"Bli med",answer:"blir-med",answeredAs:a=>`${a} blir med`},hjelp:{label:"Be om hjelp",action:"Jeg kan hjelpe",answer:"kan-hjelpe",answeredAs:a=>`${a} kan hjelpe`},tilbud:{label:"Tilbyr hjelp",action:"Ja takk",answer:"onsker",answeredAs:a=>`${a} vil gjerne`},info:{label:"Til info",action:null,answer:null,answeredAs:a=>a}},te=80,ne=600,se=80,Ue=5,_e=24,ae=500,Ce=14,ie=90,P=a=>({ok:!1,error:a}),E=a=>a.trim().replace(/\s+/g," ");function Fe(a){let t=[];for(let n of a)if(typeof n=="string")for(let e of n.split(/[\s,#]+/)){let s=e.toLocaleLowerCase("nb").replace(/[^\p{L}\p{N}-]/gu,"").slice(0,_e);if(s&&!t.includes(s)&&t.push(s),t.length===Ue)return t}return t}var V=a=>typeof a=="string";function re(a,t,n){if(!a||typeof a!="object")return P("Mangler innhold.");let e=a,s=e.kind;if(!K.includes(s))return P("Velg hva innlegget gjelder: invitasjon, hjelp, tilbud eller info.");let o=V(e.title)?E(e.title):"";if(!o)return P("Skriv en overskrift.");if(o.length>te)return P(`Overskriften kan ha opptil ${te} tegn.`);let r=V(e.body)?e.body.trim():"";if(r.length>ne)return P(`Teksten kan ha opptil ${ne} tegn.`);let l=V(e.place)?E(e.place):"";if(l.length>se)return P(`Stedet kan ha opptil ${se} tegn.`);if(e.tags!==void 0&&!Array.isArray(e.tags))return P("Taggene må være en liste.");let m;if(e.when!==void 0&&e.when!==null&&e.when!==""){if(!V(e.when)||!/(Z|[+-]\d{2}:\d{2})$/.test(e.when)||Number.isNaN(Date.parse(e.when)))return P("Tidspunktet må være et tidspunkt med tidssone.");if(m=new Date(e.when).toISOString(),n(m)<t)return P("Tidspunktet har vært.")}let p=$(t,ie),h=V(e.lastDay)&&e.lastDay?e.lastDay:m?n(m):$(t,Ce);if(!Q(h))return P("Siste dag er ikke en gyldig dato.");if(h<t)return P("Siste dag har vært.");if(h>p)return P(`Et innlegg kan stå i opptil ${ie} dager.`);if(e.discreet===!0&&s!=="hjelp")return P("Bare en forespørsel om hjelp kan være diskret.");let f={kind:s,title:o,body:r,tags:Fe(e.tags??[]),lastDay:h,discreet:s==="hjelp"&&e.discreet===!0};return m&&(f.when=m),l&&(f.place=l),{ok:!0,value:f}}var U=(a,t)=>!a.closedAt&&a.lastDay>=t,H=(a,t,n)=>!a.discreet||a.authorId===t||n==="vert",G=(a,t,n)=>a.authorId===t||n==="vert",Be=(a,t)=>a.createdAt<t.createdAt?1:a.createdAt>t.createdAt?-1:0;function Z(a,t,n,e){return a.filter(s=>U(s,e)).filter(s=>H(s,n.userId,n.role)).filter(s=>!t.kind||s.kind===t.kind).filter(s=>!t.tag||s.tags.includes(t.tag)).sort(Be)}function oe(a){let t=new Map;for(let n of a)for(let e of n.tags)t.set(e,(t.get(e)??0)+1);return[...t.entries()].sort(([n,e],[s,o])=>o-e||n.localeCompare(s,"nb")).map(([n])=>n)}function le(a,t,n){return U(a,n)?a.authorId===t?"Du kan ikke svare på ditt eget innlegg.":a.discreet?"En diskret forespørsel følges opp av landsbyvertene.":x[a.kind].answer?null:"Dette innlegget tar ikke svar.":"Innlegget er ikke lenger på torget."}var He=(a,t)=>a.at<t.at?-1:a.at>t.at?1:0,de=(a,t)=>a.filter(n=>n.postId===t).sort(He);function Ge(a){return a.length<=1?a[0]??"":`${a.slice(0,-1).join(", ")} og ${a[a.length-1]}`}function ce(a,t){return t.length===0?null:x[a].answeredAs(Ge(t.map(n=>n.name)))}function z(a,t,n,e){if(t===n)return!1;let s=o=>e.some(r=>r.postId===a.id&&r.userId===o);return a.authorId===t&&s(n)||a.authorId===n&&s(t)}function pe(a){let t=typeof a=="string"?a.trim():"";return t?t.length>ae?P(`En melding kan ha opptil ${ae} tegn.`):{ok:!0,value:t}:P("Skriv en melding.")}var ge=(a,t,n,e)=>a.filter(s=>s.postId===t&&(s.fromId===n&&s.toId===e||s.fromId===e&&s.toId===n)).sort((s,o)=>s.at<o.at?-1:s.at>o.at?1:0);var me=80,ue=80,he=500,fe=500,T=a=>({ok:!1,error:a}),_=a=>typeof a=="string"?a:"";function be(a){if(!a||typeof a!="object")return T("Mangler innhold.");let t=a,n=E(_(t.name));if(!n)return T("Skriv navnet ditt.");if(n.length>me)return T(`Navnet kan ha opptil ${me} tegn.`);let e=E(_(t.area));if(e.length>ue)return T(`Området kan ha opptil ${ue} tegn.`);let s=_(t.connection).trim();if(s.length>he)return T(`Teksten kan ha opptil ${he} tegn.`);if(t.acceptedRules!==!0)return T("Du må godta levereglene for å søke.");let o={name:n};return e&&(o.area=e),s&&(o.connection=s),{ok:!0,value:o}}function ve(a){let t=a&&typeof a=="object"?a:{},n=t.role??"landsbyboer";if(n!=="landsbyboer"&&n!=="medlem")return T("En ny kan bli landsbyboer eller medlem.");let e=_(t.welcome).trim();return e.length>fe?T(`Velkomsthilsenen kan ha opptil ${fe} tegn.`):{ok:!0,value:e?{role:n,welcome:e}:{role:n}}}var we={vert:0,medlem:1,landsbyboer:2},ye=(a,t)=>we[a.role]-we[t.role]||a.name.localeCompare(t.name,"nb");var b=class extends Error{status;constructor(t,n){super(n),this.status=t}},J=a=>new b(404,`Fant ikke ${a}.`),R=(a="Du har ikke tilgang til dette.")=>new b(403,a);function Ze(a){return`${a}-${Date.now().toString(36)}-${crypto.randomUUID().slice(0,8)}`}var C=class{store;clock;newId;constructor(t){this.store=t.store,this.clock=t.clock??{now:()=>Date.now()},this.newId=t.newId??Ze}nowIso=()=>new Date(this.clock.now()).toISOString();async village(t){let n=await this.store.getVillage(t);if(!n)throw J("landsbyen");return n}today=t=>D(t.timeZone,this.clock.now());async member(t,n){let e=await this.store.getMember(t.id,n.id);if(!e)throw R("Du er ikke med i denne landsbyen ennå. Søk om å bli med.");return e}async host(t,n){let e=await this.member(t,n);if(e.role!=="vert")throw R("Bare landsbyvertene kan gjøre dette.");return e}postView(t,n,e){let s=de(n,t.id),o=s.find(l=>l.userId===e.userId),r=x[t.kind];return{...t,responses:s.map(({userId:l,name:m,answer:p,at:h})=>({userId:l,name:m,answer:p,at:h})),answersLine:ce(t.kind,s),mine:t.authorId===e.userId,myAnswer:o?.answer??null,action:t.authorId===e.userId||t.discreet?null:r.action}}async me(t){let n=await this.store.membershipsOf(t.id),e=await this.store.applicationsOf(t.id);return{userId:t.id,name:t.name,...t.email?{email:t.email}:{},memberships:n.map(s=>({villageId:s.villageId,role:s.role})),pendingApplications:e.filter(s=>s.status==="venter").map(s=>s.villageId)}}getVillage(t){return this.village(t)}async preview(t){let n=await this.village(t),e=this.today(n),s=(await this.store.listPosts(t)).filter(r=>U(r,e)&&!r.discreet),o=s.filter(r=>r.kind==="invitasjon").sort((r,l)=>(r.when??r.lastDay).localeCompare(l.when??l.lastDay)).slice(0,5).map(r=>({title:r.title,...r.when?{when:r.when}:{},tags:r.tags}));return{postsOnTorget:s.length,upcomingInvitations:o}}async members(t,n){let e=await this.village(t),s=await this.member(e,n);return(await this.store.listMembers(t)).sort(ye).map(r=>s.role==="vert"?{userId:r.userId,name:r.name,role:r.role,joinedAt:r.joinedAt,...r.area?{area:r.area}:{}}:{userId:r.userId,name:r.name,role:r.role})}async apply(t,n,e){let s=await this.village(t);if(await this.store.getMember(t,n.id))throw new b(409,"Du er allerede med i landsbyen.");if((await this.store.applicationsOf(n.id)).find(m=>m.villageId===t&&m.status==="venter"))throw new b(409,"Søknaden din venter allerede på en landsbyvert.");let r=be(e);if(!r.ok)throw new b(400,r.error);let l={id:this.newId("soknad"),villageId:s.id,userId:n.id,...r.value,status:"venter",appliedAt:this.nowIso()};return await this.store.putApplication(l),l}async applications(t,n){let e=await this.village(t),s=await this.store.getMember(e.id,n.id),o=await this.store.listApplications(t);return(s?.role==="vert"?o.filter(l=>l.status==="venter"):o.filter(l=>l.userId===n.id)).sort((l,m)=>l.appliedAt.localeCompare(m.appliedAt))}async waitingApplication(t,n){let e=await this.store.getApplication(t.id,n);if(!e)throw J("søknaden");if(e.status!=="venter")throw new b(409,"Søknaden er allerede behandlet.");return e}async approve(t,n,e,s){let o=await this.village(t);await this.host(o,e);let r=await this.waitingApplication(o,n),l=ve(s);if(!l.ok)throw new b(400,l.error);let m=this.nowIso(),p={villageId:t,userId:r.userId,name:r.name,role:l.value.role,joinedAt:m,...r.area?{area:r.area}:{}};return await this.store.putMember(p),await this.store.putApplication({...r,status:"godkjent",decidedAt:m,decidedBy:e.id,...l.value.welcome?{welcome:l.value.welcome}:{}}),{userId:p.userId,name:p.name,role:p.role,joinedAt:p.joinedAt}}async reject(t,n,e,s){let o=await this.village(t);await this.host(o,e);let r=await this.waitingApplication(o,n),l=typeof s?.reason=="string"?s.reason.trim().slice(0,500):"",m={...r,status:"avslatt",decidedAt:this.nowIso(),decidedBy:e.id,...l?{reason:l}:{}};return await this.store.putApplication(m),m}async posts(t,n,e){let s=await this.village(t),o=await this.member(s,n),r={};if(e.kind){if(!K.includes(e.kind))throw new b(400,"Ukjent type innlegg.");r.kind=e.kind}e.tag&&(r.tag=e.tag.toLocaleLowerCase("nb").replace(/^#/,""));let[l,m]=await Promise.all([this.store.listPosts(t),this.store.listResponses(t)]);return Z(l,r,o,this.today(s)).map(p=>this.postView(p,m,o))}async tags(t,n){let e=await this.village(t),s=await this.member(e,n);return oe(Z(await this.store.listPosts(t),{},s,this.today(e)))}async createPost(t,n,e){let s=await this.village(t),o=await this.member(s,n),r=re(e,this.today(s),m=>D(s.timeZone,m));if(!r.ok)throw new b(400,r.error);let l={id:this.newId("innlegg"),villageId:t,...r.value,authorId:o.userId,authorName:o.name,createdAt:this.nowIso()};return await this.store.putPost(l),this.postView(l,[],o)}async visiblePost(t,n,e){let s=await this.store.getPost(t.id,n);if(!s||!H(s,e.userId,e.role))throw J("innlegget");return s}async post(t,n,e){let s=await this.village(t),o=await this.member(s,e),r=await this.visiblePost(s,n,o);return this.postView(r,await this.store.listResponses(t,n),o)}async closePost(t,n,e){let s=await this.village(t),o=await this.member(s,e),r=await this.visiblePost(s,n,o);if(!G(r,o.userId,o.role))throw R("Bare den som la ut innlegget, eller en landsbyvert, kan avslutte det.");let l={...r,closedAt:r.closedAt??this.nowIso()};return await this.store.putPost(l),this.postView(l,await this.store.listResponses(t,n),o)}async deletePost(t,n,e){let s=await this.village(t),o=await this.member(s,e),r=await this.visiblePost(s,n,o);if(!G(r,o.userId,o.role))throw R("Bare den som la ut innlegget, eller en landsbyvert, kan slette det.");await this.store.deletePost(t,n)}async answer(t,n,e){let s=await this.village(t),o=await this.member(s,e),r=await this.visiblePost(s,n,o),l=le(r,o.userId,this.today(s));if(l)throw new b(409,l);return(await this.store.listResponses(t,n)).find(p=>p.userId===o.userId)||await this.store.putResponse({villageId:t,postId:n,userId:o.userId,name:o.name,answer:x[r.kind].answer,at:this.nowIso()}),this.postView(r,await this.store.listResponses(t,n),o)}async withdraw(t,n,e){let s=await this.village(t),o=await this.member(s,e),r=await this.visiblePost(s,n,o);return await this.store.deleteResponse(t,n,o.userId),this.postView(r,await this.store.listResponses(t,n),o)}async messages(t,n,e,s){let o=await this.village(t),r=await this.member(o,e),l=await this.visiblePost(o,n,r);if(!s)throw new b(400,"Si hvem samtalen er med.");let m=await this.store.listResponses(t,n),p=await this.store.listMessages(t,n),h=ge(p,n,r.userId,s);if(h.length===0&&!z(l,r.userId,s,m))throw R("Private meldinger går mellom den som la ut innlegget og dem som har svart.");return h}async sendMessage(t,n,e,s){let o=await this.village(t),r=await this.member(o,e),l=await this.visiblePost(o,n,r),m=s?.to;if(typeof m!="string"||!m)throw new b(400,"Si hvem meldingen skal til.");let p=pe(s.text);if(!p.ok)throw new b(400,p.error);if(!z(l,r.userId,m,await this.store.listResponses(t,n)))throw R("Private meldinger går mellom den som la ut innlegget og dem som har svart.");let h={id:this.newId("melding"),villageId:t,postId:n,fromId:r.userId,fromName:r.name,toId:m,text:p.value,at:this.nowIso()};return await this.store.putMessage(h),h}async conversations(t,n){let e=await this.village(t),s=await this.member(e,n),[o,r,l]=await Promise.all([this.store.listMessages(t),this.store.listPosts(t),this.store.listMembers(t)]),m=new Map;for(let p of o){if(p.fromId!==s.userId&&p.toId!==s.userId)continue;let h=p.fromId===s.userId?p.toId:p.fromId,f=`${p.postId}|${h}`,A=m.get(f);(!A||A.at<p.at)&&m.set(f,p)}return[...m.entries()].map(([p,h])=>{let[f,A]=p.split("|");return{postId:f,postTitle:r.find(k=>k.id===f)?.title??"Slettet innlegg",withId:A,withName:l.find(k=>k.userId===A)?.name??(h.fromId===A?h.fromName:"Ukjent"),lastText:h.text,lastAt:h.at}}).sort((p,h)=>h.lastAt.localeCompare(p.lastAt))}};var ze=()=>({villages:[],members:[],applications:[],posts:[],responses:[],messages:[]}),I=a=>structuredClone(a),F=class{data;keeper;constructor(t){this.keeper=t,this.data={...ze(),...t?.load()??{}}}save(){this.keeper?.save(this.data)}upsert(t,n,e){let s=t.findIndex(e);s>=0?t[s]=I(n):t.push(I(n)),this.save()}async getVillage(t){return I(this.data.villages.find(n=>n.id===t)??null)}async putVillage(t){this.upsert(this.data.villages,t,n=>n.id===t.id)}async getMember(t,n){return I(this.data.members.find(e=>e.villageId===t&&e.userId===n)??null)}async listMembers(t){return I(this.data.members.filter(n=>n.villageId===t))}async membershipsOf(t){return I(this.data.members.filter(n=>n.userId===t))}async putMember(t){this.upsert(this.data.members,t,n=>n.villageId===t.villageId&&n.userId===t.userId)}async getApplication(t,n){return I(this.data.applications.find(e=>e.villageId===t&&e.id===n)??null)}async listApplications(t){return I(this.data.applications.filter(n=>n.villageId===t))}async applicationsOf(t){return I(this.data.applications.filter(n=>n.userId===t))}async putApplication(t){this.upsert(this.data.applications,t,n=>n.id===t.id)}async getPost(t,n){return I(this.data.posts.find(e=>e.villageId===t&&e.id===n)??null)}async listPosts(t){return I(this.data.posts.filter(n=>n.villageId===t))}async putPost(t){this.upsert(this.data.posts,t,n=>n.id===t.id)}async deletePost(t,n){let e=s=>!(s.villageId===t&&(s.postId??s.id)===n);this.data.posts=this.data.posts.filter(s=>!(s.villageId===t&&s.id===n)),this.data.responses=this.data.responses.filter(e),this.data.messages=this.data.messages.filter(e),this.save()}async listResponses(t,n){return I(this.data.responses.filter(e=>e.villageId===t&&(!n||e.postId===n)))}async putResponse(t){this.upsert(this.data.responses,t,n=>n.villageId===t.villageId&&n.postId===t.postId&&n.userId===t.userId)}async deleteResponse(t,n,e){this.data.responses=this.data.responses.filter(s=>!(s.villageId===t&&s.postId===n&&s.userId===e)),this.save()}async listMessages(t,n){return I(this.data.messages.filter(e=>e.villageId===t&&(!n||e.postId===n)))}async putMessage(t){this.upsert(this.data.messages,t,n=>n.id===t.id)}};function ke(a,t,n){let e=()=>{let s=n();if(!s)throw new b(401,"Du må logge inn.");return s};return{me:()=>a.me(e()),village:()=>a.getVillage(t),preview:()=>a.preview(t),members:()=>a.members(t,e()),apply:s=>a.apply(t,e(),s),applications:()=>a.applications(t,e()),approve:(s,o)=>a.approve(t,s,e(),o),reject:s=>a.reject(t,s,e(),{}),posts:s=>a.posts(t,e(),s),createPost:s=>a.createPost(t,e(),s),closePost:s=>a.closePost(t,s,e()),deletePost:s=>a.deletePost(t,s,e()),answer:s=>a.answer(t,s,e()),withdraw:s=>a.withdraw(t,s,e()),messages:(s,o)=>a.messages(t,s,e(),o),sendMessage:(s,o,r)=>a.sendMessage(t,s,e(),{to:o,text:r}),conversations:()=>a.conversations(t,e())}}var d=a=>String(a??"").replace(/[&<>"']/g,t=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[t]),S=a=>a.split(" ")[0],X={vert:"landsbyvert",medlem:"medlem",landsbyboer:"landsbyboer"},$e={"blir-med":"Du blir med","kan-hjelpe":"Du har sagt at du kan hjelpe",onsker:"Du har sagt ja takk"},Pe=["invitasjon","hjelp","tilbud","info"],Ie={invitasjon:"Inviter til noe",hjelp:"Be om hjelp",tilbud:"Tilby hjelp",info:"Del noe med landsbyen"},Je={invitasjon:"For eksempel: Kaffe etter gudstjenesten",hjelp:"For eksempel: Trenger skyss til legen torsdag",tilbud:"For eksempel: Har tilhenger til utlån",info:"For eksempel: Funnet lue ved skolen"};function Ae(a){let{root:t,api:n}=a,e={me:null,village:null,role:null,tab:"torget",kind:null,tag:null,posts:[],preview:null,conversations:[],applications:[],members:[],composing:null,thread:null,threadMessages:[],confirmDelete:null,notice:null,busy:!1},s=()=>e.village?.timeZone??"Europe/Oslo",o=()=>D(s());function r(i){let g=new Intl.DateTimeFormat("nb-NO",{timeZone:s(),weekday:"long",day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"}).format(new Date(i));return g.charAt(0).toUpperCase()+g.slice(1)}function l(i){return i===o()?"i dag":i===$(o(),1)?"i morgen":new Intl.DateTimeFormat("nb-NO",{timeZone:"UTC",day:"numeric",month:"long"}).format(new Date(`${i}T12:00:00Z`))}function m(i){let g=Math.round((Date.now()-Date.parse(i))/6e4);if(g<60)return g<=1?"nå nettopp":`for ${g} minutter siden`;let u=Math.round(g/60);if(u<24)return u===1?"for en time siden":`for ${u} timer siden`;let c=Math.round(u/24);return c===1?"i går":`for ${c} dager siden`}async function p(i,g){e.busy=!0;try{await i(),g&&(e.notice={text:g,error:!1})}catch(u){e.notice={text:u instanceof Error?u.message:"Noe gikk galt.",error:!0}}finally{e.busy=!1,j()}}async function h(){if(e.village=await n.village(),e.me=await n.me(),e.role=e.me.memberships.find(i=>i.villageId===a.villageId)?.role??null,!e.role){e.preview=await n.preview(),e.applications=await n.applications();return}e.tab==="vert"&&e.role!=="vert"&&(e.tab="torget"),await f()}async function f(){e.tab==="torget"&&(e.posts=await n.posts({kind:e.kind??void 0,tag:e.tag??void 0})),e.tab==="samtaler"&&(e.conversations=await n.conversations()),e.tab==="vert"&&(e.applications=await n.applications(),e.members=await n.members()),e.role==="vert"&&e.tab!=="vert"&&(e.applications=await n.applications())}async function A(i){e.thread=i,e.threadMessages=await n.messages(i.postId,i.withId)}function k(){return`<svg class="roofline" viewBox="0 0 360 64" role="img" aria-label="Hus og kirke i landsbyen">
+      <g class="r-house">
+        <path d="M6 64V36l20-16 20 16v28z"/><path d="M52 64V42l16-13 16 13v22z"/>
+        <path d="M90 64V30l24-19 24 19v34z"/>
+      </g>
+      <g class="r-church">
+        <path d="M150 64V34l22-18 22 18v30z"/><path d="M165 22V10h14v12l-7-6z"/><path d="M171 2h2v8h-2z"/><path d="M168 4h8v2h-8z"/>
+      </g>
+      <g class="r-house">
+        <path d="M202 64V40l18-14 18 14v24z"/><path d="M244 64V32l22-17 22 17v32z"/>
+        <path d="M294 64V44l15-12 15 12v20z"/><path d="M330 64V38l14-11 14 11v26z"/>
+      </g>
+      <g class="r-window"><rect x="22" y="44" width="8" height="8"/><rect x="108" y="40" width="10" height="9"/><rect x="168" y="44" width="8" height="12" rx="4"/><rect x="258" y="42" width="9" height="9"/></g>
+    </svg>`}function Te(){let i=e.village,g=a.people.find(c=>c.id===a.currentPerson()),u=a.people.length?`<div class="switcher">
+          <label for="person">Du ser landsbyen som</label>
+          <select id="person" data-action="person">
+            ${a.people.map(c=>`<option value="${d(c.id)}" ${c.id===g?.id?"selected":""}>${d(c.name)}</option>`).join("")}
+          </select>
+          ${a.demoNote?`<p class="hint">${d(a.demoNote)}</p>`:""}
+        </div>`:"";return`<header class="top">
+      <div class="top-inner">
+        ${k()}
+        <div class="who">
+          <h1>${d(i?.name??"Landsbyen")}</h1>
+          ${i?`<p class="anchor">Drevet av <strong>${d(i.anchor.name)}</strong></p>`:""}
+        </div>
+        ${u}
+      </div>
+    </header>`}function Se(){return e.notice?`<div class="notice ${e.notice.error?"is-error":""}" role="status">
+      <span>${d(e.notice.text)}</span>
+      <button type="button" class="link" data-action="dismiss" aria-label="Lukk meldingen">Lukk</button>
+    </div>`:""}function Me(){let i=e.applications.filter(u=>u.status==="venter").length,g=[["torget","Torget"],["samtaler","Samtaler"]];return e.role==="vert"&&g.push(["vert",i?`Søknader (${i})`:"Søknader"]),`<nav class="tabs" aria-label="Landsbyen">${g.map(([u,c])=>`<button type="button" data-action="tab" data-tab="${u}" ${e.tab===u?'aria-current="page"':""}>${d(c)}</button>`).join("")}</nav>`}function De(){let i=[`<button type="button" class="chip ${e.kind?"":"is-on"}" data-action="kind" data-kind="">Alt</button>`].concat(Pe.map(u=>`<button type="button" class="chip kind-${u} ${e.kind===u?"is-on":""}" data-action="kind" data-kind="${u}">${d(x[u].label)}</button>`)).join(""),g=e.tag?`<p class="tag-filter">Viser innlegg merket <strong>#${d(e.tag)}</strong> <button type="button" class="link" data-action="tag" data-tag="">Vis alle</button></p>`:"";return`<div class="filters" role="group" aria-label="Vis">${i}</div>${g}`}function je(){let i=e.composing;if(!i)return`<div class="compose-start">
+        <p>Hva vil du ta opp med landsbyen?</p>
+        <div class="compose-kinds">${Pe.map(u=>`<button type="button" class="kind-pick kind-${u}" data-action="compose" data-kind="${u}">${d(Ie[u])}</button>`).join("")}</div>
+      </div>`;let g=i==="invitasjon";return`<form class="composer kind-${i}" data-form="post">
+      <div class="composer-head">
+        <h2>${d(Ie[i])}</h2>
+        <button type="button" class="link" data-action="compose" data-kind="">Avbryt</button>
+      </div>
+      <label for="f-title">Overskrift</label>
+      <input id="f-title" name="title" maxlength="80" required placeholder="${d(Je[i])}">
+      <label for="f-body">Fortell litt mer <span class="opt">valgfritt</span></label>
+      <textarea id="f-body" name="body" maxlength="600" rows="3"></textarea>
+      ${g?`<div class="row">
+              <div><label for="f-day">Dag</label><input id="f-day" name="day" type="date" min="${o()}" required></div>
+              <div><label for="f-clock">Klokka</label><input id="f-clock" name="clock" type="time" value="18:00"></div>
+            </div>`:""}
+      ${g||i==="hjelp"?'<label for="f-place">Sted <span class="opt">valgfritt</span></label><input id="f-place" name="place" maxlength="80">':""}
+      <label for="f-tags">Stikkord <span class="opt">valgfritt, skill med mellomrom</span></label>
+      <input id="f-tags" name="tags" placeholder="tur barn middag">
+      ${g?"":`<label for="f-last">Står på torget til</label><input id="f-last" name="lastDay" type="date" min="${o()}" max="${$(o(),90)}" value="${$(o(),14)}">`}
+      ${i==="hjelp"?`<label class="check" for="f-discreet"><input id="f-discreet" name="discreet" type="checkbox">
+              <span>Spør diskret. Bare landsbyvertene ser forespørselen, og de tar kontakt med deg.</span></label>`:""}
+      <button type="submit" class="primary" ${e.busy?"disabled":""}>Legg ut på torget</button>
+    </form>`}function Re(i){let g=x[i.kind],u=i.mine||e.role==="vert",c=i.when?`<p class="when">${d(r(i.when))}${i.place?`<br>${d(i.place)}`:""}</p>`:i.place?`<p class="when">${d(i.place)}</p>`:"",v=i.tags.length?`<p class="tags">${i.tags.map(w=>`<button type="button" class="tag" data-action="tag" data-tag="${d(w)}">#${d(w)}</button>`).join(" ")}</p>`:"",y="";if(!i.mine&&i.action&&!i.myAnswer&&(y+=`<button type="button" class="primary act kind-${i.kind}" data-action="answer" data-post="${i.id}">${d(i.action)}</button>`),!i.mine&&i.myAnswer&&(y+=`<p class="answered">${d($e[i.myAnswer])}.</p>
+        <button type="button" class="secondary" data-action="write" data-post="${i.id}" data-with="${d(i.authorId)}" data-name="${d(i.authorName)}">Skriv til ${d(S(i.authorName))}</button>
+        <button type="button" class="link" data-action="withdraw" data-post="${i.id}">Trekk svaret</button>`),i.mine&&i.responses.length&&(y+=`<div class="responders">${i.responses.map(w=>`<button type="button" class="secondary" data-action="write" data-post="${i.id}" data-with="${d(w.userId)}" data-name="${d(w.name)}">Skriv til ${d(S(w.name))}</button>`).join("")}</div>`),u){let w=e.confirmDelete===i.id;y+=`<div class="manage">
+        <button type="button" class="link" data-action="close" data-post="${i.id}">${i.kind==="hjelp"?"Hjelpen er gitt, avslutt":"Avslutt"}</button>
+        ${w?`<span class="confirm">Slette for godt? <button type="button" class="link danger" data-action="delete" data-post="${i.id}">Ja, slett</button> <button type="button" class="link" data-action="nodelete">Nei</button></span>`:`<button type="button" class="link" data-action="askdelete" data-post="${i.id}">Slett</button>`}
+      </div>`}return`<article class="post kind-${i.kind}">
+      <p class="kind">${d(g.label)}${i.discreet?'<span class="discreet">Diskret</span>':""}</p>
+      <h3>${d(i.title)}</h3>
+      ${c}
+      ${i.body?`<p class="body">${d(i.body)}</p>`:""}
+      ${v}
+      ${i.discreet?`<p class="note">Bare ${i.mine?"du og ":`${d(S(i.authorName))} og `}landsbyvertene ser denne.</p>`:""}
+      <p class="by">${d(i.mine?"Lagt ut av deg":`Lagt ut av ${i.authorName}`)} ${d(m(i.createdAt))}. Står til ${d(l(i.lastDay))}.</p>
+      ${i.answersLine?`<p class="answers">${d(i.answersLine)}</p>`:""}
+      ${y?`<div class="actions">${y}</div>`:""}
+    </article>`}function Ne(){let i=e.posts.length?e.posts.map(Re).join(""):`<p class="empty">${e.kind||e.tag?"Ingen innlegg her akkurat nå. Prøv et annet filter, eller legg ut det første.":"Torget er tomt. Legg ut den første invitasjonen."}</p>`;return`${je()}${De()}<div class="posts">${i}</div>`}function Ve(){return e.conversations.length?`<ul class="conversations">${e.conversations.map(i=>`<li><button type="button" data-action="write" data-post="${d(i.postId)}" data-with="${d(i.withId)}" data-name="${d(i.withName)}" data-title="${d(i.postTitle)}">
+          <strong>${d(i.withName)}</strong>
+          <span class="about">Om: ${d(i.postTitle)}</span>
+          <span class="last">${d(i.lastText)}</span>
+          <span class="ago">${d(m(i.lastAt))}</span>
+        </button></li>`).join("")}</ul>`:'<p class="empty">Her havner samtalene dine. Når du svarer på et innlegg, eller noen svarer på ditt, kan dere skrive til hverandre.</p>'}function Ee(){let i=e.applications.filter(c=>c.status==="venter"),g=i.length?i.map(c=>`<article class="application">
+          <h3>${d(c.name)}</h3>
+          <p class="meta">Søkte ${d(m(c.appliedAt))}${c.area?`. Bor: ${d(c.area)}`:""}</p>
+          ${c.connection?`<p class="body">${d(c.connection)}</p>`:""}
+          <label for="w-${d(c.id)}">Velkomsthilsen <span class="opt">valgfritt</span></label>
+          <textarea id="w-${d(c.id)}" rows="2" maxlength="500" placeholder="Velkommen til landsbyen, ${d(S(c.name))}!"></textarea>
+          <div class="actions">
+            <button type="button" class="primary" data-action="approve" data-app="${d(c.id)}" data-role="landsbyboer">Godkjenn som landsbyboer</button>
+            <button type="button" class="secondary" data-action="approve" data-app="${d(c.id)}" data-role="medlem">Godkjenn som medlem</button>
+            <button type="button" class="link danger" data-action="reject" data-app="${d(c.id)}">Avslå</button>
+          </div>
+        </article>`).join(""):'<p class="empty">Ingen søknader venter. Nye søknader dukker opp her, og du får se dem med en gang.</p>',u=e.members.map(c=>`<li><span>${d(c.name)}</span><span class="role role-${c.role}">${d(X[c.role])}</span></li>`).join("");return`<section aria-labelledby="h-apps"><h2 id="h-apps">Søknader som venter</h2>${g}</section>
+      <section aria-labelledby="h-members"><h2 id="h-members">I landsbyen (${e.members.length})</h2><ul class="members">${u}</ul></section>`}function Oe(){let i=e.village,g=e.applications.find(w=>w.status==="venter"),u=e.applications.find(w=>w.status==="avslatt"),c=e.preview,v=c?.upcomingInvitations.length?`<ul class="teaser">${c.upcomingInvitations.map(w=>`<li><strong>${d(w.title)}</strong>${w.when?`<span>${d(r(w.when))}</span>`:""}</li>`).join("")}</ul>`:"",y=g?'<div class="waiting"><h2>Søknaden din er sendt</h2><p>En landsbyvert ser på den og gir deg beskjed. Det tar som regel under et døgn.</p></div>':u?`<div class="waiting"><h2>Søknaden ble ikke godkjent</h2><p>Ta gjerne kontakt med ${d(i.anchor.name)} hvis du lurer på hvorfor.</p></div>`:`<form class="apply" data-form="apply">
+            <h2>Søk om å bli med</h2>
+            <label for="a-name">Navn</label>
+            <input id="a-name" name="name" maxlength="80" required value="${d(e.me?.name??"")}">
+            <label for="a-area">Hvor bor du? <span class="opt">valgfritt</span></label>
+            <input id="a-area" name="area" maxlength="80">
+            <label for="a-conn">Hva er tilknytningen din til området? <span class="opt">valgfritt</span></label>
+            <textarea id="a-conn" name="connection" maxlength="500" rows="2"></textarea>
+            <label class="check" for="a-rules"><input id="a-rules" name="acceptedRules" type="checkbox" required><span>Jeg godtar levereglene</span></label>
+            <button type="submit" class="primary" ${e.busy?"disabled":""}>Send søknad</button>
+          </form>`;return`<section class="intro">
+        <p class="lead">${d(i.description)}</p>
+        ${c?`<p class="count">${c.postsOnTorget} innlegg på torget nå. Dette skjer snart:</p>${v}`:""}
+        <h2>Levereglene</h2>
+        <ul class="rules">${i.rules.map(w=>`<li>${d(w)}</li>`).join("")}</ul>
+      </section>${y}`}function Le(){let i=e.thread;if(!i)return"";let g=e.me.userId,u=e.threadMessages.length?e.threadMessages.map(c=>`<li class="${c.fromId===g?"from-me":""}"><p>${d(c.text)}</p><span>${d(c.fromId===g?"Du":S(c.fromName))}, ${d(m(c.at))}</span></li>`).join(""):'<li class="first">Skriv det første ordet. Bare dere to ser samtalen.</li>';return`<div class="thread-backdrop" data-action="closethread"></div>
+      <section class="thread" role="dialog" aria-modal="true" aria-labelledby="h-thread">
+        <div class="thread-head">
+          <div><h2 id="h-thread">${d(i.withName)}</h2><p>Om: ${d(i.postTitle)}</p></div>
+          <button type="button" class="link" data-action="closethread">Lukk</button>
+        </div>
+        <ul class="messages">${u}</ul>
+        <form class="say" data-form="message">
+          <label for="m-text" class="sr">Melding til ${d(S(i.withName))}</label>
+          <textarea id="m-text" name="text" rows="2" maxlength="500" required placeholder="Skriv til ${d(S(i.withName))}"></textarea>
+          <button type="submit" class="primary">Send</button>
+        </form>
+      </section>`}function j(){let i=document.activeElement?.id,g="";if(!e.village)g='<p class="empty">Henter landsbyen …</p>';else if(!e.role)g=Oe();else{let u=`<p class="you">Du er ${d(X[e.role])} i landsbyen.</p>`;g=`${Me()}${u}${e.tab==="torget"?Ne():e.tab==="samtaler"?Ve():Ee()}`}if(t.innerHTML=`${Te()}<main class="page">${Se()}${g}</main>${Le()}`,i&&document.getElementById(i)?.focus(),e.thread){let u=t.querySelector(".messages");u&&(u.scrollTop=u.scrollHeight)}}t.addEventListener("click",i=>{let g=i.target.closest("[data-action]");if(!g||g.tagName==="SELECT")return;let{action:u,post:c,tab:v,kind:y,tag:w}=g.dataset;switch(e.notice=u==="dismiss"?null:e.notice,u){case"dismiss":return j();case"tab":return e.tab=v,e.composing=null,void p(f);case"kind":return e.kind=y||null,void p(f);case"tag":return e.tag=w||null,e.tab="torget",void p(f);case"compose":e.composing=y||null,j(),e.composing&&document.getElementById("f-title")?.focus();return;case"answer":return void p(async()=>{let M=await n.answer(c);await f(),e.notice={text:`${$e[M.myAnswer??""]??"Svart"}. ${S(M.authorName)} ser svaret ditt.`,error:!1}});case"withdraw":return void p(async()=>{await n.withdraw(c),await f()},"Svaret er trukket.");case"close":return void p(async()=>{await n.closePost(c),await f()},"Innlegget er avsluttet og tatt av torget.");case"askdelete":return e.confirmDelete=c,j();case"nodelete":return e.confirmDelete=null,j();case"delete":return e.confirmDelete=null,void p(async()=>{await n.deletePost(c),await f()},"Innlegget er slettet.");case"write":{let M=g.dataset.title??e.posts.find(O=>O.id===c)?.title??"";return void p(()=>A({postId:c,postTitle:M,withId:g.dataset.with,withName:g.dataset.name}))}case"closethread":return e.thread=null,void p(f);case"approve":{let M=g.dataset.app,O=document.getElementById(`w-${M}`)?.value.trim(),q=g.dataset.role;return void p(async()=>{let W=await n.approve(M,O?{role:q,welcome:O}:{role:q});await f(),e.notice={text:`${W.name} er godkjent som ${X[W.role]}.`,error:!1}})}case"reject":return void p(async()=>{await n.reject(g.dataset.app),await f()},"Søknaden er avslått.")}}),t.addEventListener("change",i=>{let g=i.target;g.dataset.action==="person"&&(a.setPerson(g.value),e.thread=null,e.composing=null,e.notice=null,e.tab="torget",p(h))}),t.addEventListener("submit",i=>{i.preventDefault();let g=i.target,u=new FormData(g),c=v=>String(u.get(v)??"").trim();if(g.dataset.form==="post"&&e.composing){let v=e.composing,y={kind:v,title:c("title"),body:c("body"),tags:c("tags")?[c("tags")]:[],place:c("place")||void 0,discreet:u.get("discreet")==="on"};return v==="invitasjon"&&c("day")&&(y.when=N(c("day"),c("clock")||"11:00",s())),v!=="invitasjon"&&c("lastDay")&&(y.lastDay=c("lastDay")),void p(async()=>{await n.createPost(y),e.composing=null,e.kind=null,e.tag=null,await f()},y.discreet?"Forespørselen er sendt diskret til landsbyvertene.":"Innlegget står på torget.")}if(g.dataset.form==="message"&&e.thread){let v=e.thread;return void p(async()=>{await n.sendMessage(v.postId,v.withId,c("text")),e.threadMessages=await n.messages(v.postId,v.withId)})}if(g.dataset.form==="apply")return void p(async()=>{await n.apply({name:c("name"),area:c("area")||void 0,connection:c("connection")||void 0,acceptedRules:u.get("acceptedRules")==="on"}),e.applications=await n.applications()},"Søknaden er sendt.")}),t.addEventListener("keydown",i=>{i.key==="Escape"&&e.thread&&(e.thread=null,p(f))}),j(),p(h)}var xe=new F,Xe=new C({store:xe}),Y="kari";await ee(xe);Ae({root:document.getElementById("app"),api:ke(Xe,L,()=>B.find(a=>a.id===Y)??null),villageId:L,people:B,currentPerson:()=>Y,setPerson:a=>{Y=a},demoNote:"Alt her er oppdiktet, og demoen starter på nytt når siden lastes."});
+</script>

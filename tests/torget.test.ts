@@ -12,7 +12,7 @@ import {
   tagsInUse,
   torget,
 } from "../src/domain/torget.ts";
-import { addDays, dayIn, isIsoDay } from "../src/domain/days.ts";
+import { addDays, dayIn, isIsoDay, momentIn } from "../src/domain/days.ts";
 import { readApplication, readApproval } from "../src/domain/applications.ts";
 import type { Post, PostResponse } from "../src/domain/types.ts";
 
@@ -168,5 +168,9 @@ describe("Søknader og dager", () => {
     assert.equal(isIsoDay("2026-02-30"), false);
     assert.equal(isIsoDay("2026-10-18"), true);
     assert.equal(dayIn("Europe/Oslo", "2026-10-18T22:30:00Z"), "2026-10-19");
+    // Summer time, winter time, and the night the clocks go back
+    assert.equal(momentIn("2026-10-24", "11:00", "Europe/Oslo"), "2026-10-24T09:00:00.000Z");
+    assert.equal(momentIn("2026-11-07", "11:00", "Europe/Oslo"), "2026-11-07T10:00:00.000Z");
+    assert.equal(momentIn("2026-10-25", "12:00", "Europe/Oslo"), "2026-10-25T11:00:00.000Z");
   });
 });

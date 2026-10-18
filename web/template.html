@@ -1,0 +1,203 @@
+<title>Landsbyen</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Literata:opsz,wght@7..72,500;7..72,700&display=swap">
+<style>
+/* Layout: one phone-width column under a pine-green band where the village's roofline (with its church) stands on the edge. */
+:root {
+  --fjord: #edf2ef;      /* page */
+  --surface: #ffffff;    /* posts, forms */
+  --ink: #17231e;
+  --muted: #52615a;
+  --line: #cfdad4;
+  --skog: #1f5a45;       /* the band, primary buttons */
+  --skog-ink: #f3f7f4;   /* text on the band */
+  --roof: #2f7a5f;       /* houses on the band */
+  --roof-church: #e9efe9;
+  --oker: #9a6a07;       /* invitation */
+  --hav: #255f8f;        /* help */
+  --lyng: #77468c;       /* offer */
+  --stein: #5c6762;      /* info */
+  --action: #1f5a45;     /* primary buttons, chosen filter, own messages */
+  --action-ink: #f3f7f4;
+  --danger: #a3341f;
+  --focus: #e0a412;
+  --font-display: "Literata", Georgia, "Times New Roman", serif;
+  --font-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --step-0: 1.0625rem;
+  --step-1: 1.25rem;
+  --step-2: 1.6rem;
+  --step-3: 2.1rem;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --fjord: #101a16; --surface: #182520; --ink: #e3ece7; --muted: #9fb2a9; --line: #2b3d35;
+    --skog: #173f31; --skog-ink: #eef5f0; --roof: #24604a; --roof-church: #cfe0d6;
+    --oker: #e2b44a; --hav: #82b8e3; --lyng: #c9a0dc; --stein: #a8b3ae; --danger: #f08a73; --focus: #f2c14e; --action: #6dbb98; --action-ink: #0e1b16;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --fjord: #101a16; --surface: #182520; --ink: #e3ece7; --muted: #9fb2a9; --line: #2b3d35;
+  --skog: #173f31; --skog-ink: #eef5f0; --roof: #24604a; --roof-church: #cfe0d6;
+  --oker: #e2b44a; --hav: #82b8e3; --lyng: #c9a0dc; --stein: #a8b3ae; --danger: #f08a73; --focus: #f2c14e; --action: #6dbb98; --action-ink: #0e1b16;
+  color-scheme: dark;
+}
+
+html { -webkit-text-size-adjust: 100%; }
+body { background: var(--fjord); color: var(--ink); font-family: var(--font-body); font-size: var(--step-0); line-height: 1.5; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--skog); }
+* { box-sizing: border-box; }
+h1, h2, h3 { font-family: var(--font-display); line-height: 1.2; text-wrap: balance; margin: 0; }
+p { margin: 0; }
+button, input, textarea, select { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+/* The band */
+.top { background: var(--skog); color: var(--skog-ink); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.top-inner { max-width: 40rem; margin: 0 auto; padding-block: 1.25rem 1.25rem; display: grid; gap: 1rem; }
+.roofline { width: 100%; max-width: 100%; height: auto; display: block; order: -1; }
+.r-house path { fill: var(--roof); }
+.r-church path { fill: var(--roof-church); }
+.r-window rect { fill: var(--skog); }
+.top h1 { font-size: var(--step-3); font-weight: 700; letter-spacing: -0.01em; }
+.anchor { margin-top: 0.25rem; opacity: 0.92; }
+.anchor strong { font-weight: 700; }
+.switcher { display: grid; gap: 0.35rem; padding: 0.75rem; border-radius: 6px; background: color-mix(in srgb, var(--skog-ink) 10%, transparent); }
+.switcher label { font-size: 0.9rem; }
+.switcher select { padding: 0.5rem; border-radius: 4px; border: 1px solid color-mix(in srgb, var(--skog-ink) 40%, transparent); background: var(--surface); color: var(--ink); }
+.switcher .hint { font-size: 0.85rem; opacity: 0.85; }
+
+/* The page */
+.page { max-width: 40rem; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 1rem 4rem; display: grid; gap: 1.25rem; }
+.page > * { min-width: 0; }
+.you { color: var(--muted); font-size: 0.95rem; margin-top: -0.5rem; }
+.empty { color: var(--muted); padding: 1.25rem; border: 1px dashed var(--line); border-radius: 6px; }
+
+.tabs { display: flex; gap: 0.25rem; border-bottom: 2px solid var(--line); }
+.tabs button { background: none; border: 0; padding: 0.7rem 0.9rem; font-weight: 700; color: var(--muted); border-bottom: 3px solid transparent; margin-bottom: -2px; cursor: pointer; }
+.tabs button[aria-current="page"] { color: var(--ink); border-bottom-color: var(--action); }
+
+.notice { display: flex; gap: 1rem; justify-content: space-between; align-items: start; padding: 0.8rem 1rem; border-radius: 6px; background: color-mix(in srgb, var(--action) 12%, var(--surface)); border: 1px solid color-mix(in srgb, var(--action) 35%, var(--line)); }
+.notice.is-error { background: color-mix(in srgb, var(--danger) 10%, var(--surface)); border-color: color-mix(in srgb, var(--danger) 45%, var(--line)); }
+
+/* Kinds: each has its own colour, used on its label, its chip and its button */
+.kind-invitasjon { --kind: var(--oker); }
+.kind-hjelp { --kind: var(--hav); }
+.kind-tilbud { --kind: var(--lyng); }
+.kind-info { --kind: var(--stein); }
+
+button.primary, button.secondary { border-radius: 6px; padding: 0.7rem 1.1rem; font-weight: 700; cursor: pointer; min-height: 2.9rem; }
+button.primary { background: var(--action); color: var(--action-ink); border: 0; }
+button.primary.act { background: var(--kind); color: var(--surface); }
+button.primary:disabled { opacity: 0.6; cursor: wait; }
+button.secondary { background: var(--surface); border: 1.5px solid var(--line); }
+button.link { background: none; border: 0; padding: 0.25rem 0; color: var(--ink); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+button.link.danger { color: var(--danger); }
+
+/* Starting a post */
+.compose-start { display: grid; gap: 0.6rem; }
+.compose-start p { font-family: var(--font-display); font-size: var(--step-1); }
+.compose-kinds { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; }
+.kind-pick { text-align: left; padding: 0.8rem 0.9rem; border-radius: 6px; border: 1.5px solid color-mix(in srgb, var(--kind) 45%, var(--line)); background: color-mix(in srgb, var(--kind) 8%, var(--surface)); font-weight: 700; cursor: pointer; min-height: 3.2rem; }
+.kind-pick:hover { background: color-mix(in srgb, var(--kind) 16%, var(--surface)); }
+
+form { display: grid; gap: 0.35rem; }
+.composer, .apply { background: var(--surface); border: 1px solid var(--line); border-top: 4px solid var(--kind, var(--action)); border-radius: 6px; padding: 1rem; }
+.composer-head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; margin-bottom: 0.5rem; }
+.composer h2, .apply h2 { font-size: var(--step-1); }
+label { font-weight: 700; margin-top: 0.5rem; }
+.opt { font-weight: 400; color: var(--muted); }
+input, textarea, select { width: 100%; padding: 0.65rem 0.7rem; border: 1.5px solid var(--line); border-radius: 4px; background: var(--surface); }
+textarea { resize: vertical; }
+.row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; }
+.row > div { display: grid; gap: 0.35rem; }
+label.check { display: flex; gap: 0.6rem; align-items: start; font-weight: 400; margin-block: 0.5rem; }
+label.check input { width: 1.3rem; height: 1.3rem; margin-top: 0.15rem; flex: none; }
+form button[type="submit"] { margin-top: 0.75rem; justify-self: start; }
+
+/* Filters */
+.filters { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.chip { border: 1.5px solid var(--line); background: var(--surface); border-radius: 999px; padding: 0.35rem 0.85rem; cursor: pointer; font-size: 0.95rem; }
+.chip.is-on { background: var(--kind, var(--action)); border-color: var(--kind, var(--action)); color: var(--surface); font-weight: 700; }
+.chip.is-on:not([class*="kind-"]) { color: var(--action-ink); }
+.tag-filter { color: var(--muted); }
+
+/* Posts */
+.posts { display: grid; gap: 0.9rem; }
+.post { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 1rem 1rem 1.1rem; display: grid; gap: 0.5rem; }
+.post .kind { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; font-size: 0.9rem; color: var(--kind); }
+.post .kind::before { content: ""; width: 0.95rem; height: 0.95rem; background: var(--kind); clip-path: polygon(50% 0, 100% 45%, 100% 100%, 0 100%, 0 45%); }
+.discreet { font-weight: 700; color: var(--surface); background: var(--hav); border-radius: 3px; padding: 0 0.4rem; font-size: 0.8rem; }
+.post h3 { font-size: var(--step-1); font-weight: 700; }
+.when { font-weight: 700; }
+.body { max-width: 62ch; }
+.tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.tag { background: none; border: 0; padding: 0; color: var(--kind); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; font-size: 0.95rem; }
+.note { font-size: 0.95rem; color: var(--hav); }
+.by { font-size: 0.9rem; color: var(--muted); }
+.answers { font-weight: 700; color: var(--kind); }
+.actions { display: flex; flex-wrap: wrap; gap: 0.6rem 1rem; align-items: center; margin-top: 0.35rem; }
+.answered { flex-basis: 100%; font-weight: 700; color: var(--kind); }
+.responders { display: flex; flex-wrap: wrap; gap: 0.5rem; flex-basis: 100%; }
+.manage { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; }
+.confirm { display: inline-flex; gap: 0.6rem; align-items: center; }
+
+/* Conversations */
+.conversations { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
+.conversations button { width: 100%; text-align: left; display: grid; gap: 0.15rem; padding: 0.85rem 1rem; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; cursor: pointer; }
+.conversations .about, .conversations .ago { color: var(--muted); font-size: 0.9rem; }
+.conversations .last { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.thread-backdrop { position: fixed; inset: 0; background: color-mix(in srgb, var(--ink) 45%, transparent); z-index: 20; }
+.thread { position: fixed; z-index: 21; left: 0; right: 0; bottom: 0; max-height: 85%; margin: 0 auto; max-width: 40rem; background: var(--surface); border-radius: 12px 12px 0 0; display: grid; grid-template-rows: auto 1fr auto; padding: 1rem max(16px, env(safe-area-inset-right, 0px)) calc(1rem + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+.thread-head { display: flex; justify-content: space-between; align-items: start; gap: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--line); }
+.thread-head h2 { font-size: var(--step-1); }
+.thread-head p { color: var(--muted); font-size: 0.95rem; }
+.messages { list-style: none; margin: 0; padding: 1rem 0; display: flex; flex-direction: column; gap: 0.6rem; overflow-y: auto; min-height: 8rem; }
+.messages li { max-width: 85%; align-self: flex-start; display: grid; gap: 0.2rem; }
+.messages li p { background: var(--fjord); border-radius: 10px 10px 10px 2px; padding: 0.55rem 0.8rem; }
+.messages li.from-me { align-self: flex-end; text-align: right; }
+.messages li.from-me p { background: var(--action); color: var(--action-ink); border-radius: 10px 10px 2px 10px; text-align: left; }
+.messages li span { font-size: 0.8rem; color: var(--muted); }
+.messages li.first { color: var(--muted); max-width: none; }
+.say { grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 0.5rem; }
+.say button { margin-top: 0; }
+
+/* Hosts */
+section { display: grid; gap: 0.75rem; }
+section > h2 { font-size: var(--step-1); }
+.application { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 1rem; display: grid; gap: 0.4rem; }
+.application h3 { font-size: var(--step-1); }
+.meta { color: var(--muted); font-size: 0.95rem; }
+.members { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.members li { display: flex; justify-content: space-between; gap: 1rem; padding: 0.6rem 0; border-bottom: 1px solid var(--line); }
+.role { font-size: 0.9rem; color: var(--muted); }
+.role-vert { color: var(--action); font-weight: 700; }
+
+/* Before joining */
+.intro .lead { font-family: var(--font-display); font-size: var(--step-1); line-height: 1.45; max-width: 60ch; }
+.count { font-weight: 700; }
+.teaser { margin: 0; padding: 0; list-style: none; display: grid; gap: 0.5rem; }
+.teaser li { display: grid; padding: 0.7rem 0.9rem; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; }
+.teaser span { color: var(--muted); font-size: 0.95rem; }
+.rules { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.3rem; }
+.waiting { background: var(--surface); border: 1px solid var(--line); border-top: 4px solid var(--action); border-radius: 6px; padding: 1rem; display: grid; gap: 0.4rem; }
+.waiting h2 { font-size: var(--step-1); }
+
+@media (min-width: 40rem) {
+  .top-inner { grid-template-columns: 1fr auto; align-items: end; }
+  .roofline { grid-column: 1 / -1; }
+  .switcher { min-width: 15rem; }
+  .compose-kinds { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .thread { bottom: 2rem; border-radius: 12px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .thread { animation: rise 160ms ease-out; }
+  @keyframes rise { from { transform: translateY(1.5rem); opacity: 0.6; } }
+}
+</style>
+<div id="app"></div>
+<script type="module">/*APP*/</script>

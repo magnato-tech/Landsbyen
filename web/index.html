@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="nb">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Landsbyen</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Literata:opsz,wght@7..72,500;7..72,700&display=swap">
+<style>
+/* Layout: one phone-width column under a pine-green band where the village's roofline (with its church) stands on the edge. */
+:root {
+  --fjord: #edf2ef;      /* page */
+  --surface: #ffffff;    /* posts, forms */
+  --ink: #17231e;
+  --muted: #52615a;
+  --line: #cfdad4;
+  --skog: #1f5a45;       /* the band, primary buttons */
+  --skog-ink: #f3f7f4;   /* text on the band */
+  --roof: #2f7a5f;       /* houses on the band */
+  --roof-church: #e9efe9;
+  --oker: #9a6a07;       /* invitation */
+  --hav: #255f8f;        /* help */
+  --lyng: #77468c;       /* offer */
+  --stein: #5c6762;      /* info */
+  --action: #1f5a45;     /* primary buttons, chosen filter, own messages */
+  --action-ink: #f3f7f4;
+  --danger: #a3341f;
+  --focus: #e0a412;
+  --font-display: "Literata", Georgia, "Times New Roman", serif;
+  --font-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --step-0: 1.0625rem;
+  --step-1: 1.25rem;
+  --step-2: 1.6rem;
+  --step-3: 2.1rem;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --fjord: #101a16; --surface: #182520; --ink: #e3ece7; --muted: #9fb2a9; --line: #2b3d35;
+    --skog: #173f31; --skog-ink: #eef5f0; --roof: #24604a; --roof-church: #cfe0d6;
+    --oker: #e2b44a; --hav: #82b8e3; --lyng: #c9a0dc; --stein: #a8b3ae; --danger: #f08a73; --focus: #f2c14e; --action: #6dbb98; --action-ink: #0e1b16;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --fjord: #101a16; --surface: #182520; --ink: #e3ece7; --muted: #9fb2a9; --line: #2b3d35;
+  --skog: #173f31; --skog-ink: #eef5f0; --roof: #24604a; --roof-church: #cfe0d6;
+  --oker: #e2b44a; --hav: #82b8e3; --lyng: #c9a0dc; --stein: #a8b3ae; --danger: #f08a73; --focus: #f2c14e; --action: #6dbb98; --action-ink: #0e1b16;
+  color-scheme: dark;
+}
+
+html { -webkit-text-size-adjust: 100%; }
+body { background: var(--fjord); color: var(--ink); font-family: var(--font-body); font-size: var(--step-0); line-height: 1.5; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--skog); }
+* { box-sizing: border-box; }
+h1, h2, h3 { font-family: var(--font-display); line-height: 1.2; text-wrap: balance; margin: 0; }
+p { margin: 0; }
+button, input, textarea, select { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+/* The band */
+.top { background: var(--skog); color: var(--skog-ink); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.top-inner { max-width: 40rem; margin: 0 auto; padding-block: 1.25rem 1.25rem; display: grid; gap: 1rem; }
+.roofline { width: 100%; max-width: 100%; height: auto; display: block; order: -1; }
+.r-house path { fill: var(--roof); }
+.r-church path { fill: var(--roof-church); }
+.r-window rect { fill: var(--skog); }
+.top h1 { font-size: var(--step-3); font-weight: 700; letter-spacing: -0.01em; }
+.anchor { margin-top: 0.25rem; opacity: 0.92; }
+.anchor strong { font-weight: 700; }
+.switcher { display: grid; gap: 0.35rem; padding: 0.75rem; border-radius: 6px; background: color-mix(in srgb, var(--skog-ink) 10%, transparent); }
+.switcher label { font-size: 0.9rem; }
+.switcher select { padding: 0.5rem; border-radius: 4px; border: 1px solid color-mix(in srgb, var(--skog-ink) 40%, transparent); background: var(--surface); color: var(--ink); }
+.switcher .hint { font-size: 0.85rem; opacity: 0.85; }
+
+/* The page */
+.page { max-width: 40rem; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 1rem 4rem; display: grid; gap: 1.25rem; }
+.page > * { min-width: 0; }
+.you { color: var(--muted); font-size: 0.95rem; margin-top: -0.5rem; }
+.empty { color: var(--muted); padding: 1.25rem; border: 1px dashed var(--line); border-radius: 6px; }
+
+.tabs { display: flex; gap: 0.25rem; border-bottom: 2px solid var(--line); }
+.tabs button { background: none; border: 0; padding: 0.7rem 0.9rem; font-weight: 700; color: var(--muted); border-bottom: 3px solid transparent; margin-bottom: -2px; cursor: pointer; }
+.tabs button[aria-current="page"] { color: var(--ink); border-bottom-color: var(--action); }
+
+.notice { display: flex; gap: 1rem; justify-content: space-between; align-items: start; padding: 0.8rem 1rem; border-radius: 6px; background: color-mix(in srgb, var(--action) 12%, var(--surface)); border: 1px solid color-mix(in srgb, var(--action) 35%, var(--line)); }
+.notice.is-error { background: color-mix(in srgb, var(--danger) 10%, var(--surface)); border-color: color-mix(in srgb, var(--danger) 45%, var(--line)); }
+
+/* Kinds: each has its own colour, used on its label, its chip and its button */
+.kind-invitasjon { --kind: var(--oker); }
+.kind-hjelp { --kind: var(--hav); }
+.kind-tilbud { --kind: var(--lyng); }
+.kind-info { --kind: var(--stein); }
+
+button.primary, button.secondary { border-radius: 6px; padding: 0.7rem 1.1rem; font-weight: 700; cursor: pointer; min-height: 2.9rem; }
+button.primary { background: var(--action); color: var(--action-ink); border: 0; }
+button.primary.act { background: var(--kind); color: var(--surface); }
+button.primary:disabled { opacity: 0.6; cursor: wait; }
+button.secondary { background: var(--surface); border: 1.5px solid var(--line); }
+button.link { background: none; border: 0; padding: 0.25rem 0; color: var(--ink); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+button.link.danger { color: var(--danger); }
+
+/* Starting a post */
+.compose-start { display: grid; gap: 0.6rem; }
+.compose-start p { font-family: var(--font-display); font-size: var(--step-1); }
+.compose-kinds { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; }
+.kind-pick { text-align: left; padding: 0.8rem 0.9rem; border-radius: 6px; border: 1.5px solid color-mix(in srgb, var(--kind) 45%, var(--line)); background: color-mix(in srgb, var(--kind) 8%, var(--surface)); font-weight: 700; cursor: pointer; min-height: 3.2rem; }
+.kind-pick:hover { background: color-mix(in srgb, var(--kind) 16%, var(--surface)); }
+
+form { display: grid; gap: 0.35rem; }
+.composer, .apply { background: var(--surface); border: 1px solid var(--line); border-top: 4px solid var(--kind, var(--action)); border-radius: 6px; padding: 1rem; }
+.composer-head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; margin-bottom: 0.5rem; }
+.composer h2, .apply h2 { font-size: var(--step-1); }
+label { font-weight: 700; margin-top: 0.5rem; }
+.opt { font-weight: 400; color: var(--muted); }
+input, textarea, select { width: 100%; padding: 0.65rem 0.7rem; border: 1.5px solid var(--line); border-radius: 4px; background: var(--surface); }
+textarea { resize: vertical; }
+.row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; }
+.row > div { display: grid; gap: 0.35rem; }
+label.check { display: flex; gap: 0.6rem; align-items: start; font-weight: 400; margin-block: 0.5rem; }
+label.check input { width: 1.3rem; height: 1.3rem; margin-top: 0.15rem; flex: none; }
+form button[type="submit"] { margin-top: 0.75rem; justify-self: start; }
+
+/* Filters */
+.filters { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.chip { border: 1.5px solid var(--line); background: var(--surface); border-radius: 999px; padding: 0.35rem 0.85rem; cursor: pointer; font-size: 0.95rem; }
+.chip.is-on { background: var(--kind, var(--action)); border-color: var(--kind, var(--action)); color: var(--surface); font-weight: 700; }
+.chip.is-on:not([class*="kind-"]) { color: var(--action-ink); }
+.tag-filter { color: var(--muted); }
+
+/* Posts */
+.posts { display: grid; gap: 0.9rem; }
+.post { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 1rem 1rem 1.1rem; display: grid; gap: 0.5rem; }
+.post .kind { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; font-size: 0.9rem; color: var(--kind); }
+.post .kind::before { content: ""; width: 0.95rem; height: 0.95rem; background: var(--kind); clip-path: polygon(50% 0, 100% 45%, 100% 100%, 0 100%, 0 45%); }
+.discreet { font-weight: 700; color: var(--surface); background: var(--hav); border-radius: 3px; padding: 0 0.4rem; font-size: 0.8rem; }
+.post h3 { font-size: var(--step-1); font-weight: 700; }
+.when { font-weight: 700; }
+.body { max-width: 62ch; }
+.tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.tag { background: none; border: 0; padding: 0; color: var(--kind); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; font-size: 0.95rem; }
+.note { font-size: 0.95rem; color: var(--hav); }
+.by { font-size: 0.9rem; color: var(--muted); }
+.answers { font-weight: 700; color: var(--kind); }
+.actions { display: flex; flex-wrap: wrap; gap: 0.6rem 1rem; align-items: center; margin-top: 0.35rem; }
+.answered { flex-basis: 100%; font-weight: 700; color: var(--kind); }
+.responders { display: flex; flex-wrap: wrap; gap: 0.5rem; flex-basis: 100%; }
+.manage { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; }
+.confirm { display: inline-flex; gap: 0.6rem; align-items: center; }
+
+/* Conversations */
+.conversations { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
+.conversations button { width: 100%; text-align: left; display: grid; gap: 0.15rem; padding: 0.85rem 1rem; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; cursor: pointer; }
+.conversations .about, .conversations .ago { color: var(--muted); font-size: 0.9rem; }
+.conversations .last { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.thread-backdrop { position: fixed; inset: 0; background: color-mix(in srgb, var(--ink) 45%, transparent); z-index: 20; }
+.thread { position: fixed; z-index: 21; left: 0; right: 0; bottom: 0; max-height: 85%; margin: 0 auto; max-width: 40rem; background: var(--surface); border-radius: 12px 12px 0 0; display: grid; grid-template-rows: auto 1fr auto; padding: 1rem max(16px, env(safe-area-inset-right, 0px)) calc(1rem + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+.thread-head { display: flex; justify-content: space-between; align-items: start; gap: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--line); }
+.thread-head h2 { font-size: var(--step-1); }
+.thread-head p { color: var(--muted); font-size: 0.95rem; }
+.messages { list-style: none; margin: 0; padding: 1rem 0; display: flex; flex-direction: column; gap: 0.6rem; overflow-y: auto; min-height: 8rem; }
+.messages li { max-width: 85%; align-self: flex-start; display: grid; gap: 0.2rem; }
+.messages li p { background: var(--fjord); border-radius: 10px 10px 10px 2px; padding: 0.55rem 0.8rem; }
+.messages li.from-me { align-self: flex-end; text-align: right; }
+.messages li.from-me p { background: var(--action); color: var(--action-ink); border-radius: 10px 10px 2px 10px; text-align: left; }
+.messages li span { font-size: 0.8rem; color: var(--muted); }
+.messages li.first { color: var(--muted); max-width: none; }
+.say { grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 0.5rem; }
+.say button { margin-top: 0; }
+
+/* Hosts */
+section { display: grid; gap: 0.75rem; }
+section > h2 { font-size: var(--step-1); }
+.application { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 1rem; display: grid; gap: 0.4rem; }
+.application h3 { font-size: var(--step-1); }
+.meta { color: var(--muted); font-size: 0.95rem; }
+.members { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.members li { display: flex; justify-content: space-between; gap: 1rem; padding: 0.6rem 0; border-bottom: 1px solid var(--line); }
+.role { font-size: 0.9rem; color: var(--muted); }
+.role-vert { color: var(--action); font-weight: 700; }
+
+/* Before joining */
+.intro .lead { font-family: var(--font-display); font-size: var(--step-1); line-height: 1.45; max-width: 60ch; }
+.count { font-weight: 700; }
+.teaser { margin: 0; padding: 0; list-style: none; display: grid; gap: 0.5rem; }
+.teaser li { display: grid; padding: 0.7rem 0.9rem; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; }
+.teaser span { color: var(--muted); font-size: 0.95rem; }
+.rules { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.3rem; }
+.waiting { background: var(--surface); border: 1px solid var(--line); border-top: 4px solid var(--action); border-radius: 6px; padding: 1rem; display: grid; gap: 0.4rem; }
+.waiting h2 { font-size: var(--step-1); }
+
+@media (min-width: 40rem) {
+  .top-inner { grid-template-columns: 1fr auto; align-items: end; }
+  .roofline { grid-column: 1 / -1; }
+  .switcher { min-width: 15rem; }
+  .compose-kinds { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .thread { bottom: 2rem; border-radius: 12px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .thread { animation: rise 160ms ease-out; }
+  @keyframes rise { from { transform: translateY(1.5rem); opacity: 0.6; } }
+}
+</style>
+<div id="app"></div>
+<script type="module">function x(i,p=Date.now()){let l=typeof p=="string"?new Date(p):new Date(p);return new Intl.DateTimeFormat("en-CA",{timeZone:i,year:"numeric",month:"2-digit",day:"2-digit"}).format(l)}function P(i,p){return new Date(Date.parse(`${i}T12:00:00Z`)+p*864e5).toISOString().slice(0,10)}function M(i,p,l){let[e,d]=p.split(":").map(Number),f=Date.parse(`${i}T${p}:00Z`);for(let o=0;o<2;o++){let u=new Intl.DateTimeFormat("en-GB",{timeZone:l,year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).formatToParts(new Date(f)).reduce((y,m)=>({...y,[m.type]:m.value}),{}),b=Date.parse(`${u.year}-${u.month}-${u.day}T${u.hour}:${u.minute}:00Z`),c=Date.parse(`${i}T${String(e).padStart(2,"0")}:${String(d).padStart(2,"0")}:00Z`);f+=c-b}return new Date(f).toISOString()}var D="eksempelby",E=[{id:"anne",name:"Anne Vertsen",email:"anne@eksempel.no"},{id:"kari",name:"Kari Nordmann",email:"kari@eksempel.no"},{id:"ola",name:"Ola Nordmann",email:"ola@eksempel.no"},{id:"sara",name:"Sara Innflytter",email:"sara@eksempel.no"},{id:"per",name:"Per Nabo",email:"per@eksempel.no"},{id:"jonas",name:"Jonas Ny",email:"jonas@eksempel.no"}];var S={invitasjon:{label:"Invitasjon",action:"Bli med",answer:"blir-med",answeredAs:i=>`${i} blir med`},hjelp:{label:"Be om hjelp",action:"Jeg kan hjelpe",answer:"kan-hjelpe",answeredAs:i=>`${i} kan hjelpe`},tilbud:{label:"Tilbyr hjelp",action:"Ja takk",answer:"onsker",answeredAs:i=>`${i} vil gjerne`},info:{label:"Til info",action:null,answer:null,answeredAs:i=>i}};var T=class extends Error{status;constructor(p,l){super(l),this.status=p}};function V(i,p,l){let e=`${i}/api/v1/villages/${encodeURIComponent(p)}`;async function d(o,u,b){let c=await fetch(u,{method:o,headers:{"Content-Type":"application/json",...l()},body:b===void 0?void 0:JSON.stringify(b)}),y=await c.text(),m=y?JSON.parse(y):void 0;if(!c.ok)throw new T(c.status,m?.error??"Noe gikk galt.");return m}let f=o=>{let u=new URLSearchParams(Object.entries(o).filter(([,b])=>b));return u.size?`?${u}`:""};return{me:()=>d("GET",`${i}/api/v1/me`),village:()=>d("GET",e),preview:()=>d("GET",`${e}/preview`),members:()=>d("GET",`${e}/members`),apply:o=>d("POST",`${e}/applications`,o),applications:()=>d("GET",`${e}/applications`),approve:(o,u)=>d("POST",`${e}/applications/${o}/approve`,u),reject:o=>d("POST",`${e}/applications/${o}/reject`,{}),posts:o=>d("GET",`${e}/posts${f(o)}`),createPost:o=>d("POST",`${e}/posts`,o),closePost:o=>d("POST",`${e}/posts/${o}/close`),deletePost:o=>d("DELETE",`${e}/posts/${o}`),answer:o=>d("PUT",`${e}/posts/${o}/response`),withdraw:o=>d("DELETE",`${e}/posts/${o}/response`),messages:(o,u)=>d("GET",`${e}/posts/${o}/messages${f({with:u})}`),sendMessage:(o,u,b)=>d("POST",`${e}/posts/${o}/messages`,{to:u,text:b}),conversations:()=>d("GET",`${e}/conversations`)}}var n=i=>String(i??"").replace(/[&<>"']/g,p=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[p]),v=i=>i.split(" ")[0],j={vert:"landsbyvert",medlem:"medlem",landsbyboer:"landsbyboer"},L={"blir-med":"Du blir med","kan-hjelpe":"Du har sagt at du kan hjelpe",onsker:"Du har sagt ja takk"},O=["invitasjon","hjelp","tilbud","info"],U={invitasjon:"Inviter til noe",hjelp:"Be om hjelp",tilbud:"Tilby hjelp",info:"Del noe med landsbyen"},te={invitasjon:"For eksempel: Kaffe etter gudstjenesten",hjelp:"For eksempel: Trenger skyss til legen torsdag",tilbud:"For eksempel: Har tilhenger til utlån",info:"For eksempel: Funnet lue ved skolen"};function K(i){let{root:p,api:l}=i,e={me:null,village:null,role:null,tab:"torget",kind:null,tag:null,posts:[],preview:null,conversations:[],applications:[],members:[],composing:null,thread:null,threadMessages:[],confirmDelete:null,notice:null,busy:!1},d=()=>e.village?.timeZone??"Europe/Oslo",f=()=>x(d());function o(t){let a=new Intl.DateTimeFormat("nb-NO",{timeZone:d(),weekday:"long",day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"}).format(new Date(t));return a.charAt(0).toUpperCase()+a.slice(1)}function u(t){return t===f()?"i dag":t===P(f(),1)?"i morgen":new Intl.DateTimeFormat("nb-NO",{timeZone:"UTC",day:"numeric",month:"long"}).format(new Date(`${t}T12:00:00Z`))}function b(t){let a=Math.round((Date.now()-Date.parse(t))/6e4);if(a<60)return a<=1?"nå nettopp":`for ${a} minutter siden`;let r=Math.round(a/60);if(r<24)return r===1?"for en time siden":`for ${r} timer siden`;let s=Math.round(r/24);return s===1?"i går":`for ${s} dager siden`}async function c(t,a){e.busy=!0;try{await t(),a&&(e.notice={text:a,error:!1})}catch(r){e.notice={text:r instanceof Error?r.message:"Noe gikk galt.",error:!0}}finally{e.busy=!1,$()}}async function y(){if(e.village=await l.village(),e.me=await l.me(),e.role=e.me.memberships.find(t=>t.villageId===i.villageId)?.role??null,!e.role){e.preview=await l.preview(),e.applications=await l.applications();return}e.tab==="vert"&&e.role!=="vert"&&(e.tab="torget"),await m()}async function m(){e.tab==="torget"&&(e.posts=await l.posts({kind:e.kind??void 0,tag:e.tag??void 0})),e.tab==="samtaler"&&(e.conversations=await l.conversations()),e.tab==="vert"&&(e.applications=await l.applications(),e.members=await l.members()),e.role==="vert"&&e.tab!=="vert"&&(e.applications=await l.applications())}async function F(t){e.thread=t,e.threadMessages=await l.messages(t.postId,t.withId)}function C(){return`<svg class="roofline" viewBox="0 0 360 64" role="img" aria-label="Hus og kirke i landsbyen">
+      <g class="r-house">
+        <path d="M6 64V36l20-16 20 16v28z"/><path d="M52 64V42l16-13 16 13v22z"/>
+        <path d="M90 64V30l24-19 24 19v34z"/>
+      </g>
+      <g class="r-church">
+        <path d="M150 64V34l22-18 22 18v30z"/><path d="M165 22V10h14v12l-7-6z"/><path d="M171 2h2v8h-2z"/><path d="M168 4h8v2h-8z"/>
+      </g>
+      <g class="r-house">
+        <path d="M202 64V40l18-14 18 14v24z"/><path d="M244 64V32l22-17 22 17v32z"/>
+        <path d="M294 64V44l15-12 15 12v20z"/><path d="M330 64V38l14-11 14 11v26z"/>
+      </g>
+      <g class="r-window"><rect x="22" y="44" width="8" height="8"/><rect x="108" y="40" width="10" height="9"/><rect x="168" y="44" width="8" height="12" rx="4"/><rect x="258" y="42" width="9" height="9"/></g>
+    </svg>`}function B(){let t=e.village,a=i.people.find(s=>s.id===i.currentPerson()),r=i.people.length?`<div class="switcher">
+          <label for="person">Du ser landsbyen som</label>
+          <select id="person" data-action="person">
+            ${i.people.map(s=>`<option value="${n(s.id)}" ${s.id===a?.id?"selected":""}>${n(s.name)}</option>`).join("")}
+          </select>
+          ${i.demoNote?`<p class="hint">${n(i.demoNote)}</p>`:""}
+        </div>`:"";return`<header class="top">
+      <div class="top-inner">
+        ${C()}
+        <div class="who">
+          <h1>${n(t?.name??"Landsbyen")}</h1>
+          ${t?`<p class="anchor">Drevet av <strong>${n(t.anchor.name)}</strong></p>`:""}
+        </div>
+        ${r}
+      </div>
+    </header>`}function H(){return e.notice?`<div class="notice ${e.notice.error?"is-error":""}" role="status">
+      <span>${n(e.notice.text)}</span>
+      <button type="button" class="link" data-action="dismiss" aria-label="Lukk meldingen">Lukk</button>
+    </div>`:""}function G(){let t=e.applications.filter(r=>r.status==="venter").length,a=[["torget","Torget"],["samtaler","Samtaler"]];return e.role==="vert"&&a.push(["vert",t?`Søknader (${t})`:"Søknader"]),`<nav class="tabs" aria-label="Landsbyen">${a.map(([r,s])=>`<button type="button" data-action="tab" data-tab="${r}" ${e.tab===r?'aria-current="page"':""}>${n(s)}</button>`).join("")}</nav>`}function Z(){let t=[`<button type="button" class="chip ${e.kind?"":"is-on"}" data-action="kind" data-kind="">Alt</button>`].concat(O.map(r=>`<button type="button" class="chip kind-${r} ${e.kind===r?"is-on":""}" data-action="kind" data-kind="${r}">${n(S[r].label)}</button>`)).join(""),a=e.tag?`<p class="tag-filter">Viser innlegg merket <strong>#${n(e.tag)}</strong> <button type="button" class="link" data-action="tag" data-tag="">Vis alle</button></p>`:"";return`<div class="filters" role="group" aria-label="Vis">${t}</div>${a}`}function z(){let t=e.composing;if(!t)return`<div class="compose-start">
+        <p>Hva vil du ta opp med landsbyen?</p>
+        <div class="compose-kinds">${O.map(r=>`<button type="button" class="kind-pick kind-${r}" data-action="compose" data-kind="${r}">${n(U[r])}</button>`).join("")}</div>
+      </div>`;let a=t==="invitasjon";return`<form class="composer kind-${t}" data-form="post">
+      <div class="composer-head">
+        <h2>${n(U[t])}</h2>
+        <button type="button" class="link" data-action="compose" data-kind="">Avbryt</button>
+      </div>
+      <label for="f-title">Overskrift</label>
+      <input id="f-title" name="title" maxlength="80" required placeholder="${n(te[t])}">
+      <label for="f-body">Fortell litt mer <span class="opt">valgfritt</span></label>
+      <textarea id="f-body" name="body" maxlength="600" rows="3"></textarea>
+      ${a?`<div class="row">
+              <div><label for="f-day">Dag</label><input id="f-day" name="day" type="date" min="${f()}" required></div>
+              <div><label for="f-clock">Klokka</label><input id="f-clock" name="clock" type="time" value="18:00"></div>
+            </div>`:""}
+      ${a||t==="hjelp"?'<label for="f-place">Sted <span class="opt">valgfritt</span></label><input id="f-place" name="place" maxlength="80">':""}
+      <label for="f-tags">Stikkord <span class="opt">valgfritt, skill med mellomrom</span></label>
+      <input id="f-tags" name="tags" placeholder="tur barn middag">
+      ${a?"":`<label for="f-last">Står på torget til</label><input id="f-last" name="lastDay" type="date" min="${f()}" max="${P(f(),90)}" value="${P(f(),14)}">`}
+      ${t==="hjelp"?`<label class="check" for="f-discreet"><input id="f-discreet" name="discreet" type="checkbox">
+              <span>Spør diskret. Bare landsbyvertene ser forespørselen, og de tar kontakt med deg.</span></label>`:""}
+      <button type="submit" class="primary" ${e.busy?"disabled":""}>Legg ut på torget</button>
+    </form>`}function X(t){let a=S[t.kind],r=t.mine||e.role==="vert",s=t.when?`<p class="when">${n(o(t.when))}${t.place?`<br>${n(t.place)}`:""}</p>`:t.place?`<p class="when">${n(t.place)}</p>`:"",h=t.tags.length?`<p class="tags">${t.tags.map(g=>`<button type="button" class="tag" data-action="tag" data-tag="${n(g)}">#${n(g)}</button>`).join(" ")}</p>`:"",w="";if(!t.mine&&t.action&&!t.myAnswer&&(w+=`<button type="button" class="primary act kind-${t.kind}" data-action="answer" data-post="${t.id}">${n(t.action)}</button>`),!t.mine&&t.myAnswer&&(w+=`<p class="answered">${n(L[t.myAnswer])}.</p>
+        <button type="button" class="secondary" data-action="write" data-post="${t.id}" data-with="${n(t.authorId)}" data-name="${n(t.authorName)}">Skriv til ${n(v(t.authorName))}</button>
+        <button type="button" class="link" data-action="withdraw" data-post="${t.id}">Trekk svaret</button>`),t.mine&&t.responses.length&&(w+=`<div class="responders">${t.responses.map(g=>`<button type="button" class="secondary" data-action="write" data-post="${t.id}" data-with="${n(g.userId)}" data-name="${n(g.name)}">Skriv til ${n(v(g.name))}</button>`).join("")}</div>`),r){let g=e.confirmDelete===t.id;w+=`<div class="manage">
+        <button type="button" class="link" data-action="close" data-post="${t.id}">${t.kind==="hjelp"?"Hjelpen er gitt, avslutt":"Avslutt"}</button>
+        ${g?`<span class="confirm">Slette for godt? <button type="button" class="link danger" data-action="delete" data-post="${t.id}">Ja, slett</button> <button type="button" class="link" data-action="nodelete">Nei</button></span>`:`<button type="button" class="link" data-action="askdelete" data-post="${t.id}">Slett</button>`}
+      </div>`}return`<article class="post kind-${t.kind}">
+      <p class="kind">${n(a.label)}${t.discreet?'<span class="discreet">Diskret</span>':""}</p>
+      <h3>${n(t.title)}</h3>
+      ${s}
+      ${t.body?`<p class="body">${n(t.body)}</p>`:""}
+      ${h}
+      ${t.discreet?`<p class="note">Bare ${t.mine?"du og ":`${n(v(t.authorName))} og `}landsbyvertene ser denne.</p>`:""}
+      <p class="by">${n(t.mine?"Lagt ut av deg":`Lagt ut av ${t.authorName}`)} ${n(b(t.createdAt))}. Står til ${n(u(t.lastDay))}.</p>
+      ${t.answersLine?`<p class="answers">${n(t.answersLine)}</p>`:""}
+      ${w?`<div class="actions">${w}</div>`:""}
+    </article>`}function J(){let t=e.posts.length?e.posts.map(X).join(""):`<p class="empty">${e.kind||e.tag?"Ingen innlegg her akkurat nå. Prøv et annet filter, eller legg ut det første.":"Torget er tomt. Legg ut den første invitasjonen."}</p>`;return`${z()}${Z()}<div class="posts">${t}</div>`}function Y(){return e.conversations.length?`<ul class="conversations">${e.conversations.map(t=>`<li><button type="button" data-action="write" data-post="${n(t.postId)}" data-with="${n(t.withId)}" data-name="${n(t.withName)}" data-title="${n(t.postTitle)}">
+          <strong>${n(t.withName)}</strong>
+          <span class="about">Om: ${n(t.postTitle)}</span>
+          <span class="last">${n(t.lastText)}</span>
+          <span class="ago">${n(b(t.lastAt))}</span>
+        </button></li>`).join("")}</ul>`:'<p class="empty">Her havner samtalene dine. Når du svarer på et innlegg, eller noen svarer på ditt, kan dere skrive til hverandre.</p>'}function q(){let t=e.applications.filter(s=>s.status==="venter"),a=t.length?t.map(s=>`<article class="application">
+          <h3>${n(s.name)}</h3>
+          <p class="meta">Søkte ${n(b(s.appliedAt))}${s.area?`. Bor: ${n(s.area)}`:""}</p>
+          ${s.connection?`<p class="body">${n(s.connection)}</p>`:""}
+          <label for="w-${n(s.id)}">Velkomsthilsen <span class="opt">valgfritt</span></label>
+          <textarea id="w-${n(s.id)}" rows="2" maxlength="500" placeholder="Velkommen til landsbyen, ${n(v(s.name))}!"></textarea>
+          <div class="actions">
+            <button type="button" class="primary" data-action="approve" data-app="${n(s.id)}" data-role="landsbyboer">Godkjenn som landsbyboer</button>
+            <button type="button" class="secondary" data-action="approve" data-app="${n(s.id)}" data-role="medlem">Godkjenn som medlem</button>
+            <button type="button" class="link danger" data-action="reject" data-app="${n(s.id)}">Avslå</button>
+          </div>
+        </article>`).join(""):'<p class="empty">Ingen søknader venter. Nye søknader dukker opp her, og du får se dem med en gang.</p>',r=e.members.map(s=>`<li><span>${n(s.name)}</span><span class="role role-${s.role}">${n(j[s.role])}</span></li>`).join("");return`<section aria-labelledby="h-apps"><h2 id="h-apps">Søknader som venter</h2>${a}</section>
+      <section aria-labelledby="h-members"><h2 id="h-members">I landsbyen (${e.members.length})</h2><ul class="members">${r}</ul></section>`}function W(){let t=e.village,a=e.applications.find(g=>g.status==="venter"),r=e.applications.find(g=>g.status==="avslatt"),s=e.preview,h=s?.upcomingInvitations.length?`<ul class="teaser">${s.upcomingInvitations.map(g=>`<li><strong>${n(g.title)}</strong>${g.when?`<span>${n(o(g.when))}</span>`:""}</li>`).join("")}</ul>`:"",w=a?'<div class="waiting"><h2>Søknaden din er sendt</h2><p>En landsbyvert ser på den og gir deg beskjed. Det tar som regel under et døgn.</p></div>':r?`<div class="waiting"><h2>Søknaden ble ikke godkjent</h2><p>Ta gjerne kontakt med ${n(t.anchor.name)} hvis du lurer på hvorfor.</p></div>`:`<form class="apply" data-form="apply">
+            <h2>Søk om å bli med</h2>
+            <label for="a-name">Navn</label>
+            <input id="a-name" name="name" maxlength="80" required value="${n(e.me?.name??"")}">
+            <label for="a-area">Hvor bor du? <span class="opt">valgfritt</span></label>
+            <input id="a-area" name="area" maxlength="80">
+            <label for="a-conn">Hva er tilknytningen din til området? <span class="opt">valgfritt</span></label>
+            <textarea id="a-conn" name="connection" maxlength="500" rows="2"></textarea>
+            <label class="check" for="a-rules"><input id="a-rules" name="acceptedRules" type="checkbox" required><span>Jeg godtar levereglene</span></label>
+            <button type="submit" class="primary" ${e.busy?"disabled":""}>Send søknad</button>
+          </form>`;return`<section class="intro">
+        <p class="lead">${n(t.description)}</p>
+        ${s?`<p class="count">${s.postsOnTorget} innlegg på torget nå. Dette skjer snart:</p>${h}`:""}
+        <h2>Levereglene</h2>
+        <ul class="rules">${t.rules.map(g=>`<li>${n(g)}</li>`).join("")}</ul>
+      </section>${w}`}function Q(){let t=e.thread;if(!t)return"";let a=e.me.userId,r=e.threadMessages.length?e.threadMessages.map(s=>`<li class="${s.fromId===a?"from-me":""}"><p>${n(s.text)}</p><span>${n(s.fromId===a?"Du":v(s.fromName))}, ${n(b(s.at))}</span></li>`).join(""):'<li class="first">Skriv det første ordet. Bare dere to ser samtalen.</li>';return`<div class="thread-backdrop" data-action="closethread"></div>
+      <section class="thread" role="dialog" aria-modal="true" aria-labelledby="h-thread">
+        <div class="thread-head">
+          <div><h2 id="h-thread">${n(t.withName)}</h2><p>Om: ${n(t.postTitle)}</p></div>
+          <button type="button" class="link" data-action="closethread">Lukk</button>
+        </div>
+        <ul class="messages">${r}</ul>
+        <form class="say" data-form="message">
+          <label for="m-text" class="sr">Melding til ${n(v(t.withName))}</label>
+          <textarea id="m-text" name="text" rows="2" maxlength="500" required placeholder="Skriv til ${n(v(t.withName))}"></textarea>
+          <button type="submit" class="primary">Send</button>
+        </form>
+      </section>`}function $(){let t=document.activeElement?.id,a="";if(!e.village)a='<p class="empty">Henter landsbyen …</p>';else if(!e.role)a=W();else{let r=`<p class="you">Du er ${n(j[e.role])} i landsbyen.</p>`;a=`${G()}${r}${e.tab==="torget"?J():e.tab==="samtaler"?Y():q()}`}if(p.innerHTML=`${B()}<main class="page">${H()}${a}</main>${Q()}`,t&&document.getElementById(t)?.focus(),e.thread){let r=p.querySelector(".messages");r&&(r.scrollTop=r.scrollHeight)}}p.addEventListener("click",t=>{let a=t.target.closest("[data-action]");if(!a||a.tagName==="SELECT")return;let{action:r,post:s,tab:h,kind:w,tag:g}=a.dataset;switch(e.notice=r==="dismiss"?null:e.notice,r){case"dismiss":return $();case"tab":return e.tab=h,e.composing=null,void c(m);case"kind":return e.kind=w||null,void c(m);case"tag":return e.tag=g||null,e.tab="torget",void c(m);case"compose":e.composing=w||null,$(),e.composing&&document.getElementById("f-title")?.focus();return;case"answer":return void c(async()=>{let k=await l.answer(s);await m(),e.notice={text:`${L[k.myAnswer??""]??"Svart"}. ${v(k.authorName)} ser svaret ditt.`,error:!1}});case"withdraw":return void c(async()=>{await l.withdraw(s),await m()},"Svaret er trukket.");case"close":return void c(async()=>{await l.closePost(s),await m()},"Innlegget er avsluttet og tatt av torget.");case"askdelete":return e.confirmDelete=s,$();case"nodelete":return e.confirmDelete=null,$();case"delete":return e.confirmDelete=null,void c(async()=>{await l.deletePost(s),await m()},"Innlegget er slettet.");case"write":{let k=a.dataset.title??e.posts.find(A=>A.id===s)?.title??"";return void c(()=>F({postId:s,postTitle:k,withId:a.dataset.with,withName:a.dataset.name}))}case"closethread":return e.thread=null,void c(m);case"approve":{let k=a.dataset.app,A=document.getElementById(`w-${k}`)?.value.trim(),N=a.dataset.role;return void c(async()=>{let R=await l.approve(k,A?{role:N,welcome:A}:{role:N});await m(),e.notice={text:`${R.name} er godkjent som ${j[R.role]}.`,error:!1}})}case"reject":return void c(async()=>{await l.reject(a.dataset.app),await m()},"Søknaden er avslått.")}}),p.addEventListener("change",t=>{let a=t.target;a.dataset.action==="person"&&(i.setPerson(a.value),e.thread=null,e.composing=null,e.notice=null,e.tab="torget",c(y))}),p.addEventListener("submit",t=>{t.preventDefault();let a=t.target,r=new FormData(a),s=h=>String(r.get(h)??"").trim();if(a.dataset.form==="post"&&e.composing){let h=e.composing,w={kind:h,title:s("title"),body:s("body"),tags:s("tags")?[s("tags")]:[],place:s("place")||void 0,discreet:r.get("discreet")==="on"};return h==="invitasjon"&&s("day")&&(w.when=M(s("day"),s("clock")||"11:00",d())),h!=="invitasjon"&&s("lastDay")&&(w.lastDay=s("lastDay")),void c(async()=>{await l.createPost(w),e.composing=null,e.kind=null,e.tag=null,await m()},w.discreet?"Forespørselen er sendt diskret til landsbyvertene.":"Innlegget står på torget.")}if(a.dataset.form==="message"&&e.thread){let h=e.thread;return void c(async()=>{await l.sendMessage(h.postId,h.withId,s("text")),e.threadMessages=await l.messages(h.postId,h.withId)})}if(a.dataset.form==="apply")return void c(async()=>{await l.apply({name:s("name"),area:s("area")||void 0,connection:s("connection")||void 0,acceptedRules:r.get("acceptedRules")==="on"}),e.applications=await l.applications()},"Søknaden er sendt.")}),p.addEventListener("keydown",t=>{t.key==="Escape"&&e.thread&&(e.thread=null,c(m))}),$(),c(y)}var _="landsbyen-person",I="kari";try{I=localStorage.getItem(_)??I}catch{}K({root:document.getElementById("app"),api:V("",D,()=>({"X-Dev-User":I})),villageId:D,people:E,currentPerson:()=>I,setPerson:i=>{I=i;try{localStorage.setItem(_,i)}catch{}},demoNote:"Utviklingsmodus: testpersoner i stedet for innlogging med Google."});
+</script>

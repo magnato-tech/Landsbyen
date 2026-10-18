@@ -8,11 +8,15 @@
     "start": "node --experimental-strip-types --no-warnings=ExperimentalWarning src/server.ts",
     "dev": "node --experimental-strip-types --no-warnings=ExperimentalWarning --watch src/server.ts",
     "test": "node --experimental-strip-types --no-warnings=ExperimentalWarning --test tests/*.test.ts",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "build:web": "node scripts/build-web.mjs"
   },
-  "engines": { "node": ">=22.6" },
+  "engines": {
+    "node": ">=22.6"
+  },
   "devDependencies": {
     "@types/node": "^22.14.0",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.2",
+    "esbuild": "^0.25.0"
   }
 }

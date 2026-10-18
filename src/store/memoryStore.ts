@@ -1,11 +1,11 @@
-// A store in memory, for a laptop, the tests and the demo. With a file name, everything is also
-// written to that file after each change and read back at start, so a restart keeps the village.
+// A store in memory, for a laptop, the tests and the demo in a browser. Given somewhere to keep
+// it (fileKeeper in fileKeeper.ts on a server), everything is also saved after each change and
+// read back at start, so a restart keeps the village.
 
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import type { Application, Member, Message, Post, PostResponse, Village } from "../domain/types.ts";
 import type { Store } from "./store.ts";
 
-interface Data {
+export interface Data {
   villages: Village[];
   members: Member[];
   applications: Application[];
@@ -17,17 +17,22 @@ interface Data {
 const empty = (): Data => ({ villages: [], members: [], applications: [], posts: [], responses: [], messages: [] });
 const copy = <T>(value: T): T => structuredClone(value);
 
+export interface Keeper {
+  load(): Partial<Data> | null;
+  save(data: Data): void;
+}
+
 export class MemoryStore implements Store {
   private data: Data;
-  private readonly file: string | undefined;
+  private readonly keeper: Keeper | undefined;
 
-  constructor(file?: string) {
-    this.file = file;
-    this.data = file && existsSync(file) ? { ...empty(), ...(JSON.parse(readFileSync(file, "utf8")) as Partial<Data>) } : empty();
+  constructor(keeper?: Keeper) {
+    this.keeper = keeper;
+    this.data = { ...empty(), ...(keeper?.load() ?? {}) };
   }
 
   private save(): void {
-    if (this.file) writeFileSync(this.file, JSON.stringify(this.data, null, 2));
+    this.keeper?.save(this.data);
   }
 
   /** Replaces one item that matches, or adds it. */
