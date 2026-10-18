@@ -1,0 +1,13 @@
+rules_version = '2';
+
+// Landsbyen leser og skriver bare gjennom API-et, som kjører med prosjektets egen tjenestekonto
+// og sjekker hvem som får se hva. Tjenestekontoen går utenom disse reglene. Alle andre,
+// også en nettleser med Firebase-klienten, er stengt ute.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

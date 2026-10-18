@@ -1,0 +1,18 @@
+{
+  "name": "landsbyen",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Konsept-app for Den digitale landsbyen: et felles torg forankret i en menighet. API først.",
+  "scripts": {
+    "start": "node --experimental-strip-types --no-warnings=ExperimentalWarning src/server.ts",
+    "dev": "node --experimental-strip-types --no-warnings=ExperimentalWarning --watch src/server.ts",
+    "test": "node --experimental-strip-types --no-warnings=ExperimentalWarning --test tests/*.test.ts",
+    "lint": "tsc --noEmit"
+  },
+  "engines": { "node": ">=22.6" },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "typescript": "^5.8.2"
+  }
+}

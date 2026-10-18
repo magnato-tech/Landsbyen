@@ -1,0 +1,645 @@
+openapi: 3.1.0
+info:
+  title: Landsbyen API
+  version: 0.1.0
+  summary: Den digitale landsbyen – et felles torg forankret i en menighet eller et nabolag.
+  description: |
+    Kontrakten for konsept-appen Landsbyen. API-et er laget først, slik at en egen webklient,
+    en mobilapp og senere Menighetsplan kan kobles på samme landsby.
+
+    **Innlogging.** I drift sender klienten et ID-token fra Firebase Authentication (Google-konto)
+    som `Authorization: Bearer <token>`. Lokalt og i demo kan serveren startes med
+    `AUTH_MODE=dev`, og da sier headeren `X-Dev-User: <brukerid>` hvem som spør.
+
+    **Roller i en landsby.**
+    - `vert` (landsbyvert): godkjenner nye, ønsker velkommen og modererer torget. Representerer forankringen.
+    - `medlem`: hører til forankringspunktet (for eksempel menigheten).
+    - `landsbyboer`: nabo, innflytter eller venn som er godkjent.
+    - En innlogget som ikke er med, kan lese landsbyens presentasjon og et utdrag av torget, og søke.
+
+    **Synlighet.** En diskret hjelpeforespørsel ses bare av den som skrev den og av vertene.
+    Private meldinger ses bare av de to som skriver sammen, og bare mellom den som la ut
+    innlegget og en som har svart på det.
+
+    Alle tekster i svar og feilmeldinger er på norsk. Datoer er kalenderdager (`2026-10-31`) i
+    landsbyens tidssone, tidspunkter er eksakte øyeblikk med tidssone (ISO 8601).
+servers:
+  - url: http://localhost:8080
+    description: Lokalt
+tags:
+  - name: Meg
+  - name: Landsby
+  - name: Søknader
+  - name: Torget
+  - name: Meldinger
+security:
+  - googleIdToken: []
+
+paths:
+  /api/v1/health:
+    get:
+      tags: [Landsby]
+      summary: Om tjenesten svarer
+      security: []
+      responses:
+        "200":
+          description: Tjenesten svarer
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  version: { type: string }
+
+  /api/v1/me:
+    get:
+      tags: [Meg]
+      summary: Hvem som er logget inn, og hvilke landsbyer de er med i
+      responses:
+        "200":
+          description: Den innloggede
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Me" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /api/v1/villages/{villageId}:
+    parameters: [{ $ref: "#/components/parameters/VillageId" }]
+    get:
+      tags: [Landsby]
+      summary: Landsbyens presentasjon, med forankringen synlig
+      description: Kan leses uten innlogging, så den kan vises før man søker.
+      security: []
+      responses:
+        "200":
+          description: Landsbyen
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Village" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /api/v1/villages/{villageId}/preview:
+    parameters: [{ $ref: "#/components/parameters/VillageId" }]
+    get:
+      tags: [Landsby]
+      summary: Utdrag av torget for den som vurderer å søke
+      description: Kommende invitasjoner og antall innlegg, uten navn og uten hjelpeforespørsler.
+      security: []
+      responses:
+        "200":
+          description: Utdraget
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Preview" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /api/v1/villages/{villageId}/members:
+    parameters: [{ $ref: "#/components/parameters/VillageId" }]
+    get:
+      tags: [Landsby]
+      summary: Hvem som er med
+      description: Medlemmer og landsbyboere ser navn og rolle. Verter ser også når de ble med og hvilket område de bor i.
+      responses:
+        "200":
+          description: Medlemmene, vertene først
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Member" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+
+  /api/v1/villages/{villageId}/applications:
+    parameters: [{ $ref: "#/components/parameters/VillageId" }]
+    post:
+      tags: [Søknader]
+      summary: Søk om å bli med i landsbyen
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/NewApplication" }
+      responses:
+        "201":
+          description: Søknaden er sendt og venter på en vert
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Application" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "409":
+          description: Allerede med, eller har en søknad som venter
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+    get:
+      tags: [Søknader]
+      summary: Søknadene som venter (verter), eller ens egen (andre)
+      responses:
+        "200":
+          description: Søknader, eldste først
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Application" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /api/v1/villages/{villageId}/applications/{applicationId}/approve:
+    parameters:
+      - { $ref: "#/components/parameters/VillageId" }
+      - { $ref: "#/components/parameters/ApplicationId" }
+    post:
+      tags: [Søknader]
+      summary: Godkjenn en søknad (vert)
+      description: Søkeren blir landsbyboer, eller medlem når verten sier at søkeren hører til forankringspunktet.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role: { type: string, enum: [landsbyboer, medlem], default: landsbyboer }
+                welcome: { type: string, maxLength: 500, description: Personlig velkomsthilsen }
+      responses:
+        "200":
+          description: Godkjent
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Member" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+
+  /api/v1/villages/{villageId}/applications/{applicationId}/reject:
+    parameters:
+      - { $ref: "#/components/parameters/VillageId" }
+      - { $ref: "#/components/parameters/ApplicationId" }
+    post:
+      tags: [Søknader]
+      summary: Avslå en søknad (vert)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason: { type: string, maxLength: 500 }
+      responses:
+        "200":
+          description: Avslått
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Application" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+
+  /api/v1/villages/{villageId}/posts:
+    parameters: [{ $ref: "#/components/parameters/VillageId" }]
+    get:
+      tags: [Torget]
+      summary: Innleggene på torget, nyeste først
+      description: Bare innlegg som ikke er avsluttet eller utløpt. Diskrete hjelpeforespørsler bare for den som skrev dem og for vertene.
+      parameters:
+        - name: kind
+          in: query
+          schema: { $ref: "#/components/schemas/PostKind" }
+        - name: tag
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: Torget
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Post" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+    post:
+      tags: [Torget]
+      summary: Legg ut et innlegg
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/NewPost" }
+      responses:
+        "201":
+          description: Innlegget står på torget
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Post" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+
+  /api/v1/villages/{villageId}/tags:
+    parameters: [{ $ref: "#/components/parameters/VillageId" }]
+    get:
+      tags: [Torget]
+      summary: Taggene på torget, mest brukt først
+      responses:
+        "200":
+          description: Taggene
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { type: string }
+        "403": { $ref: "#/components/responses/Forbidden" }
+
+  /api/v1/villages/{villageId}/posts/{postId}:
+    parameters:
+      - { $ref: "#/components/parameters/VillageId" }
+      - { $ref: "#/components/parameters/PostId" }
+    get:
+      tags: [Torget]
+      summary: Ett innlegg med svarene
+      responses:
+        "200":
+          description: Innlegget
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Post" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    delete:
+      tags: [Torget]
+      summary: Slett et innlegg (den som skrev det, eller en vert)
+      responses:
+        "204": { description: Slettet, med svar og meldinger }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /api/v1/villages/{villageId}/posts/{postId}/close:
+    parameters:
+      - { $ref: "#/components/parameters/VillageId" }
+      - { $ref: "#/components/parameters/PostId" }
+    post:
+      tags: [Torget]
+      summary: Avslutt et innlegg, for eksempel når hjelpen er gitt
+      responses:
+        "200":
+          description: Avsluttet. Innlegget forsvinner fra torget
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Post" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /api/v1/villages/{villageId}/posts/{postId}/response:
+    parameters:
+      - { $ref: "#/components/parameters/VillageId" }
+      - { $ref: "#/components/parameters/PostId" }
+    put:
+      tags: [Torget]
+      summary: Svar på innlegget – «Bli med», «Jeg kan hjelpe» eller «Ja takk»
+      description: Svaret følger av innleggets type. Svaret er synlig for alle på torget. Man kan ikke svare på sitt eget innlegg eller på en diskret forespørsel.
+      responses:
+        "200":
+          description: Svart
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Post" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+    delete:
+      tags: [Torget]
+      summary: Trekk svaret
+      responses:
+        "200":
+          description: Svaret er trukket
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Post" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /api/v1/villages/{villageId}/posts/{postId}/messages:
+    parameters:
+      - { $ref: "#/components/parameters/VillageId" }
+      - { $ref: "#/components/parameters/PostId" }
+    get:
+      tags: [Meldinger]
+      summary: Den private samtalen om innlegget med én person
+      parameters:
+        - name: with
+          in: query
+          required: true
+          description: Brukerid til den andre i samtalen
+          schema: { type: string }
+      responses:
+        "200":
+          description: Meldingene, eldste først
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Message" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    post:
+      tags: [Meldinger]
+      summary: Send en privat melding
+      description: Bare mellom den som la ut innlegget og en som har svart på det.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [to, text]
+              properties:
+                to: { type: string, description: Brukerid til mottakeren }
+                text: { type: string, minLength: 1, maxLength: 500 }
+      responses:
+        "201":
+          description: Sendt
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Message" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /api/v1/villages/{villageId}/conversations:
+    parameters: [{ $ref: "#/components/parameters/VillageId" }]
+    get:
+      tags: [Meldinger]
+      summary: Samtalene den innloggede er med i, nyeste først
+      responses:
+        "200":
+          description: Samtalene
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Conversation" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+
+components:
+  securitySchemes:
+    googleIdToken:
+      type: http
+      scheme: bearer
+      bearerFormat: Firebase ID-token (Google-konto)
+    devUser:
+      type: apiKey
+      in: header
+      name: X-Dev-User
+      description: Bare når serveren kjører med AUTH_MODE=dev
+
+  parameters:
+    VillageId:
+      name: villageId
+      in: path
+      required: true
+      schema: { type: string }
+    ApplicationId:
+      name: applicationId
+      in: path
+      required: true
+      schema: { type: string }
+    PostId:
+      name: postId
+      in: path
+      required: true
+      schema: { type: string }
+
+  responses:
+    BadRequest:
+      description: Noe i forespørselen er ikke gyldig
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    Unauthorized:
+      description: Ikke logget inn
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    Forbidden:
+      description: Ikke lov for denne brukeren
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    NotFound:
+      description: Finnes ikke, eller er ikke synlig for denne brukeren
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    Conflict:
+      description: Står i strid med det som er lagret
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+
+  schemas:
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error: { type: string, description: Feilmelding på norsk, til å vise brukeren }
+        code: { type: string }
+
+    Role:
+      type: string
+      enum: [vert, medlem, landsbyboer]
+
+    Anchor:
+      type: object
+      description: Forankringspunktet som driver landsbyen og er synlig overalt
+      required: [type, name]
+      properties:
+        type: { type: string, enum: [menighet, nabolag, borettslag, annet] }
+        name: { type: string, example: Eksempel menighet }
+        website: { type: string, format: uri }
+        externalRef:
+          type: string
+          description: Kobling til et annet system, for eksempel adressen til menighetens Menighetsplan
+
+    Village:
+      type: object
+      required: [id, name, anchor, description, rules, timeZone]
+      properties:
+        id: { type: string }
+        name: { type: string, example: Landsbyen på Eksempelby }
+        anchor: { $ref: "#/components/schemas/Anchor" }
+        description: { type: string }
+        rules:
+          type: array
+          description: Levereglene alle godtar når de søker
+          items: { type: string }
+        area: { type: string, description: Området landsbyen dekker }
+        timeZone: { type: string, example: Europe/Oslo }
+
+    Preview:
+      type: object
+      required: [postsOnTorget, upcomingInvitations]
+      properties:
+        postsOnTorget: { type: integer }
+        upcomingInvitations:
+          type: array
+          items:
+            type: object
+            required: [title]
+            properties:
+              title: { type: string }
+              when: { type: string, format: date-time }
+              tags: { type: array, items: { type: string } }
+
+    Me:
+      type: object
+      required: [userId, name, memberships]
+      properties:
+        userId: { type: string }
+        name: { type: string }
+        email: { type: string }
+        memberships:
+          type: array
+          items:
+            type: object
+            required: [villageId, role]
+            properties:
+              villageId: { type: string }
+              role: { $ref: "#/components/schemas/Role" }
+        pendingApplications:
+          type: array
+          items: { type: string, description: Landsbyer med søknad som venter }
+
+    Member:
+      type: object
+      required: [userId, name, role]
+      properties:
+        userId: { type: string }
+        name: { type: string }
+        role: { $ref: "#/components/schemas/Role" }
+        joinedAt: { type: string, format: date-time, description: Bare for verter }
+        area: { type: string, description: Bare for verter }
+
+    NewApplication:
+      type: object
+      required: [name, acceptedRules]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 80 }
+        area: { type: string, maxLength: 80, description: Hvor søkeren bor }
+        connection: { type: string, maxLength: 500, description: Tilknytning til området eller forankringspunktet }
+        acceptedRules: { type: boolean, const: true }
+
+    Application:
+      type: object
+      required: [id, villageId, userId, name, status, appliedAt]
+      properties:
+        id: { type: string }
+        villageId: { type: string }
+        userId: { type: string }
+        name: { type: string }
+        area: { type: string }
+        connection: { type: string }
+        status: { type: string, enum: [venter, godkjent, avslatt] }
+        appliedAt: { type: string, format: date-time }
+        decidedAt: { type: string, format: date-time }
+        decidedBy: { type: string }
+        welcome: { type: string }
+
+    PostKind:
+      type: string
+      enum: [invitasjon, hjelp, tilbud, info]
+
+    Answer:
+      type: string
+      enum: [blir-med, kan-hjelpe, onsker]
+      description: Følger av innleggets type. Info tar ikke svar.
+
+    NewPost:
+      type: object
+      required: [kind, title]
+      properties:
+        kind: { $ref: "#/components/schemas/PostKind" }
+        title: { type: string, minLength: 1, maxLength: 80 }
+        body: { type: string, maxLength: 600 }
+        tags:
+          type: array
+          maxItems: 5
+          items: { type: string, maxLength: 24 }
+          description: Uten «#». Lagres med små bokstaver
+        when: { type: string, format: date-time, description: Når en invitasjon skjer }
+        place: { type: string, maxLength: 80 }
+        lastDay:
+          type: string
+          format: date
+          description: Siste dag på torget. Standard er dagen invitasjonen skjer, ellers 14 dager. Høyst 90 dager fram
+        discreet:
+          type: boolean
+          default: false
+          description: Bare for «hjelp». Da ser bare vertene innlegget
+
+    Response:
+      type: object
+      required: [userId, name, answer, at]
+      properties:
+        userId: { type: string }
+        name: { type: string }
+        answer: { $ref: "#/components/schemas/Answer" }
+        at: { type: string, format: date-time }
+
+    Post:
+      type: object
+      required: [id, villageId, kind, title, body, tags, lastDay, discreet, authorId, authorName, createdAt, responses, answersLine, mine, myAnswer, action]
+      properties:
+        id: { type: string }
+        villageId: { type: string }
+        kind: { $ref: "#/components/schemas/PostKind" }
+        title: { type: string }
+        body: { type: string }
+        tags: { type: array, items: { type: string } }
+        when: { type: string, format: date-time }
+        place: { type: string }
+        lastDay: { type: string, format: date }
+        discreet: { type: boolean }
+        authorId: { type: string }
+        authorName: { type: string }
+        createdAt: { type: string, format: date-time }
+        closedAt: { type: string, format: date-time }
+        responses:
+          type: array
+          items: { $ref: "#/components/schemas/Response" }
+        answersLine:
+          type: [string, "null"]
+          description: For eksempel «Kari og Ola blir med»
+        mine: { type: boolean, description: Den innloggede skrev innlegget }
+        myAnswer:
+          oneOf:
+            - { $ref: "#/components/schemas/Answer" }
+            - { type: "null" }
+        action:
+          type: [string, "null"]
+          description: Teksten på knappen den innloggede kan trykke, eller null
+
+    Message:
+      type: object
+      required: [id, postId, fromId, fromName, toId, text, at]
+      properties:
+        id: { type: string }
+        postId: { type: string }
+        fromId: { type: string }
+        fromName: { type: string }
+        toId: { type: string }
+        text: { type: string }
+        at: { type: string, format: date-time }
+
+    Conversation:
+      type: object
+      required: [postId, postTitle, withId, withName, lastText, lastAt]
+      properties:
+        postId: { type: string }
+        postTitle: { type: string }
+        withId: { type: string }
+        withName: { type: string }
+        lastText: { type: string }
+        lastAt: { type: string, format: date-time }
